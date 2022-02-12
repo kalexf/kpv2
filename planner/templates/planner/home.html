@@ -1,0 +1,31 @@
+<!-- home page showing activity table, options for adding/editing -->
+
+{% extends 'planner/base.html' %}
+{% block content %}
+  <h4>Home Page</h4>
+<!-- Add new activity types to schedule -->
+<h4>Add exercises</h4>
+  <a href="{% url 'planner:addnew' %}">Create New Activity</a>
+<p>User Activites</p>
+  <table>
+    <tr>
+      <th>Name</th>
+    </tr>
+    {% for act in activities %}
+      <tr>
+        <td>{{act.name}}</td>
+        <td><a href="{% url 'planner:submit' act.id %}">Completed</td>
+        <td><a href="{% url 'planner:edit' act.id%}">Edit</a></td>
+        <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
+      </tr>
+     {% endfor %}
+  </table>      
+
+
+
+
+
+   
+
+{% endblock content %}
+

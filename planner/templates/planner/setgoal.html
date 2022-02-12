@@ -1,0 +1,14 @@
+{% extends 'planner/base.html' %}
+
+{% block content %}
+
+<form method="post" action="{% url 'planner:setgoal' %}" >
+  {% csrf_token %}
+  {{goal_form.as_p}}
+  <input type="hidden" name="act_id" value="{{act_id}}">
+  <input type="hidden" name="act_type" value="{{act_type}}">
+  <button name="submit">Set Goal values</button>
+</form>
+set progression here
+
+{% endblock content %}

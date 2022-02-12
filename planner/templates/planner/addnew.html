@@ -1,0 +1,31 @@
+<!-- page for creation of new activity instance -->
+
+{% extends 'planner/base.html' %}
+
+{% block content %}
+<!-- Change this to table -->
+
+<table>
+  {% for act in ACT_LIST %}
+    <tr>
+      <td>
+        <a href="{% url 'planner:addnew' act.act_type %}">
+          {{act.act_type}}
+        </a> 
+      </td>  
+      <td>{{act.description}}</td>
+    </tr>  
+  {% endfor %}
+</table>
+{% if add_form %}
+  <form method="post" action="{% url 'planner:addnew' %}">
+    {% csrf_token %}
+
+    {{add_form.as_p}}
+
+    <!-- hidden input containing activity type so addnew view knows which form type to save -->
+  <input type="hidden", name="act_type", value="{{act_type}}"> 
+
+  <button name="submit"> Create new {{act_type}}</button>  
+{% endif %}  
+{% endblock content %}

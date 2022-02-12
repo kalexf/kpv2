@@ -1,0 +1,13 @@
+{% extends 'planner/base.html' %}
+{% block content %}
+<h4> Edit details for '{{name}}'</h4>
+<form action="{% url 'planner:edit' 0 %}" method ="post">
+  {{form.as_p}}
+  {% csrf_token %}
+  {% if prog_form %}
+    <h4>Set goal values for activity</h4>
+    {{prog_form.as_p}}
+   {% endif %}
+   <input type="hidden" name="act_id" value={{act_id}}>
+   <button name="submit">Submit changes</button> 
+{% endblock content %}

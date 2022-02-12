@@ -1,0 +1,19 @@
+{% extends 'planner/base.html'  %}
+
+{% block content %}
+
+<h5>Delete activity</h5>
+  <p>Permanently delete {{activity.name}} ?</p>
+  <!-- deletion link -->
+    <form action="{% url 'planner:delete' 0 %}" method="post">
+      {%csrf_token%}
+        <input type="hidden" name="act_id" value={{activity.id}}>
+        <button name="submit">Delete</button>
+
+    </form>
+    <p>
+<!-- TODO return link button -->
+<a href="{% url 'planner:home' %}">Return</a>
+</p>
+# id - -{{activity.id}}
+{% endblock content %}
