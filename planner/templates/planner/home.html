@@ -3,9 +3,39 @@
 {% extends 'planner/base.html' %}
 {% block content %}
   <h4>Home Page</h4>
-<!-- Add new activity types to schedule -->
-<h4>Add exercises</h4>
-  <a href="{% url 'planner:addnew' %}">Create New Activity</a>
+<p>--schedule--</p>
+<table>
+  <tr>
+    <th>Mon</th>
+    <th>Tue</th>
+    <th>Wed</th>
+    <th>Thu</th>
+    <th>Fri</th>
+    <th>Sat</th>
+    <th>Sun</th>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+  <tr>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
+</table>  
+   
+<p>generate new schedule</p>
+
 <p>User Activites</p>
   <table>
     <tr>
@@ -21,10 +51,17 @@
      {% endfor %}
   </table>      
 
+<p>edit user settings/ preferences</p>
+<h4>Add exercises</h4>
+  <a href="{% url 'planner:addnew' %}">Create New Activity</a>
 
+<hr>
 
-
-
+<p>TESTS,</p>
+<p>test schedule</p>
+<p>{{test_schedule}}</p>
+<hr>
+<p>{{profile}}</p>
    
 
 {% endblock content %}

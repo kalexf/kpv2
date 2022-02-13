@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect
-from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain )
+from datetime import date
+import json
+
+from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
+	Profile, Day )
 from .forms import PR_Form, Int_Form, TT_Form, CT_Form
 from .forms import PR_Goal_Form, Int_Goal_Form, TT_Goal_Form, SubmissionForm
-from datetime import date
  #timedelta
 
 
@@ -60,6 +63,42 @@ def submit(request, act_id=None):
 	return redirect('planner:home')	
 
 		# Set act values to form values, save, redirect
+
+def get_schedule(user):
+	"""generates and returns schedule object for user, 
+	using profile / activity info"""
+	# This should just get the schedule - if changes are to be made done in
+	# another function
+	# SKELETON
+	# get all acts
+	# get profile
+	# build schedule
+	# return schedule (dump/save in view)
+	
+	profile = get_profile(user)
+	if profile.schedule:
+
+		schedule = json.loads(profile.schedule)
+		return schedule	
+	
+	else:
+		return 'no schedule'
+
+
+
+
+
+
+
+def get_profile(user):
+	"""generates profile object for the user, if none found inits one"""
+	try:
+		profile = Profile.objects.get(owner=user)
+	except:
+		profile = Profile(owner=user)
+		profile.save()	
+
+	return profile 
 
 
 def edit(request,act_id=None):
@@ -131,9 +170,17 @@ def delete(request, act_id=None):
 def home(request):
 	"""home screen"""
 	# Get a list of the user's activities to display on home screen
+	profile = get_profile(request.user)
+	# ALL checks / adjustment / saving etc should be done in get_schedule
+	test_schedule = get_schedule(request.user)
+
 	activities = Activity.objects.filter(owner=request.user)
 	
-	context = {'activities':activities}
+	context = {
+	'activities':activities,
+	'test_schedule':test_schedule,
+	'profile':profile,
+		}
 	return render(request,'planner/home.html', context)
 
 

@@ -48,6 +48,25 @@ class Profile(models.Model):
 	"""Stores information about user used to generate schedule and track
 	statistics. Any information not related to a specific activity saved here"""
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
+	# Python object converted to JSON which holds user's schedule information
+	schedule = models.JSONField(null=True)
+	last_exercise = models.DateField(null=True)
+
+#### SCHEDULE OBJECTS ####
+
+
+### not certain which attrs will be needed yet ###
+class Day:
+	"""Contains information relating to a specific day"""	
+	# ATTRS # - rest(Bool), act_id(tracks act it relates to)
+	# date - cardinal date the object is linked to
+	def __init__(self, date, rest=True, act_id=None):
+		self.rest = rest
+		if self.rest == False:
+			self.act_id = act_id
+		self.date = date 	
+
+
 
 
 # Parent class for all exercise types. All required fields / attributes here,
