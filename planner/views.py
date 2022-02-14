@@ -168,6 +168,7 @@ def home(request):
 
 	# ALL checks / adjustment / saving etc should be done in get_schedule
 	tester = test_schedule()
+	difference = (tester[0].date - date.today()).days
 	# Check / ammend schedule
 
 
@@ -175,6 +176,7 @@ def home(request):
 	activities = Activity.objects.filter(owner=request.user)
 	
 	context = {
+	'difference':difference,
 	'activities':activities,
 	'tester':tester,
 	'profile':profile,
