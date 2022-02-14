@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from datetime import date
+from datetime import date, timedelta
 import json
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
@@ -65,15 +65,7 @@ def submit(request, act_id=None):
 		# Set act values to form values, save, redirect
 
 def get_schedule(user):
-	"""generates and returns schedule object for user, 
-	using profile / activity info"""
-	# This should just get the schedule - if changes are to be made done in
-	# another function
-	# SKELETON
-	# get all acts
-	# get profile
-	# build schedule
-	# return schedule (dump/save in view)
+	"""Returns schedule object as is for user"""
 	
 	profile = get_profile(user)
 	if profile.schedule:
@@ -82,7 +74,7 @@ def get_schedule(user):
 		return schedule	
 	
 	else:
-		return 'no schedule'
+		return 0
 
 
 
@@ -158,27 +150,33 @@ def delete(request, act_id=None):
 		return redirect('planner:home')
 
 
-
-		# From confirmation form - delete
-
-	# Render confirmation page
-
-	# Delete
-
-	# Redirect to Home page
+def test_schedule():
+	"""use this for generating test schedules"""
+	# Test one - generate a schedule of 14 Rest days
+	test = []
+	for x in range(0,14):
+		day = Day(date=date.today(),rest=True)
+		day.date += timedelta(x)
+		test.append(day)
+	return test
 
 def home(request):
 	"""home screen"""
 	# Get a list of the user's activities to display on home screen
 	profile = get_profile(request.user)
+
+
 	# ALL checks / adjustment / saving etc should be done in get_schedule
-	test_schedule = get_schedule(request.user)
+	tester = test_schedule()
+	# Check / ammend schedule
+
+
 
 	activities = Activity.objects.filter(owner=request.user)
 	
 	context = {
 	'activities':activities,
-	'test_schedule':test_schedule,
+	'tester':tester,
 	'profile':profile,
 		}
 	return render(request,'planner/home.html', context)
