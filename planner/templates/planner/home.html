@@ -1,70 +1,85 @@
-<!-- home page showing activity table, options for adding/editing -->
+    <!-- home page showing activity table, options for adding/editing -->
 
-{% extends 'planner/base.html' %}
-{% block content %}
-  <h4>Home Page</h4>
-<p>--schedule--</p>
-<table>
-  <tr>
-    <th>Mon</th>
-    <th>Tue</th>
-    <th>Wed</th>
-    <th>Thu</th>
-    <th>Fri</th>
-    <th>Sat</th>
-    <th>Sun</th>
-  </tr>
-  <tr>
-    <td>{{tester.0.date}}</td>
-    <td>{{tester.1.date}}</td>
-    <td>{{tester.2.date}}</td>
-    <td>{{tester.3.date}}</td>
-    <td>{{tester.4.date}}</td>
-    <td>{{tester.5.date}}</td>
-    <td>{{tester.6.date}}</td>
-  </tr>
-  <tr>
-    <td>{{tester.7.date}}</td>
-    <td>{{tester.8.date}}</td>
-    <td>{{tester.9.date}}</td>
-    <td>{{tester.10.date}}</td>
-    <td>{{tester.11.date}}</td>
-    <td>{{tester.12.date}}</td>
-    <td>{{tester.13.date}}</td>
-  </tr>
-</table>  
-   
-<p>generate new schedule</p>
+  {% extends 'planner/base.html' %}
+    {% block content %}
+      <h4>Home Page</h4>
+        {% if schedule %}
+            <p>--schedule--</p>
+              <table>
+                <tr>
 
-<p>User Activites</p>
-  <table>
-    <tr>
-      <th>Name</th>
-    </tr>
-    {% for act in activities %}
-      <tr>
-        <td>{{act.name}}</td>
-        <td><a href="{% url 'planner:submit' act.id %}">Completed</td>
-        <td><a href="{% url 'planner:edit' act.id%}">Edit</a></td>
-        <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
-      </tr>
-     {% endfor %}
-  </table>      
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Sat</th>
+                  <th>Sun</th>
+                </tr>
+                <!-- Schedule week one -->
+                <tr>
+                  <td>{{schedule.0.date}}</td>
+                  <td>{{schedule.1.date}}</td>
+                  <td>{{schedule.2.date}}</td>
+                  <td>{{schedule.3.date}}</td>
+                  <td>{{schedule.4.date}}</td>
+                  <td>{{schedule.5.date}}</td>
+                  <td>{{schedule.6.date}}</td>
 
-<p>edit user settings/ preferences</p>
-<h4>Add exercises</h4>
-  <a href="{% url 'planner:addnew' %}">Create New Activity</a>
+                </tr>
+                <!-- week 2 -->
+                <tr>
+                  <td>{{schedule.7.date}}</td>
+                  <td>{{schedule.8.date}}</td>
+                  <td>{{schedule.9.date}}</td>
+                  <td>{{schedule.10.date}}</td>
+                  <td>{{schedule.11.date}}</td>
+                  <td>{{schedule.12.date}}</td>
+                  <td>{{schedule.13.date}}</td>
 
-<hr>
+                </tr>
+                <!-- week 3 -->
+                <tr>
+                  <td>{{schedule.14.date}}</td>
+                  <td>{{schedule.15.date}}</td>
+                  <td>{{schedule.16.date}}</td>
+                  <td>{{schedule.17.date}}</td>
+                  <td>{{schedule.18.date}}</td>
+                  <td>{{schedule.19.date}}</td>
+                  <td>{{schedule.20.date}}</td>
 
-<p>TESTS,</p>
-<p>delta value</p>
-<p>{{difference}}</p>
-<p>test schedule</p>
-<p>{{tester}}</p>
-<hr>
-<p>{{profile}}</p>
-   
+                </tr>
 
-{% endblock content %}
+                  
+            </table>  
+        {% endif %}   
+            <p>generate new schedule</p>
+              <a href="{% url 'planner:generate' %}">Generate New Schedule</a>
+
+            <p>User Activites</p>
+              <table>
+                <tr>
+                  <th>Name</th>
+                </tr>
+                {% for act in activities %}
+                  <tr>
+                    <td>{{act.name}}</td>
+                    <td><a href="{% url 'planner:submit' act.id %}">Completed</td>
+                    <td><a href="{% url 'planner:edit' act.id%}">Edit</a></td>
+                    <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
+                  </tr>
+                 {% endfor %}
+              </table>      
+
+    <p>edit user settings/ preferences</p>
+    <h4>Add exercises</h4>
+      <a href="{% url 'planner:addnew' %}">Create New Activity</a>
+
+    <hr>
+
+    <p>TESTS,</p>
+
+       
+
+    {% endblock content %}
 

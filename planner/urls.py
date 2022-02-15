@@ -15,7 +15,8 @@ urlpatterns = [
 	# Edit details of an activity
 	path('edit/<int:act_id>/',views.edit,name='edit'),
 	# Submit details of completed activity
-	path('submit/<int:act_id>/',views.submit,name='submit')
+	path('submit/<int:act_id>/',views.submit,name='submit'),
+	path('generate',views.generate_schedule,name='generate'),
 	]
 
 	# path('delete/',views.delete,name='delete'),

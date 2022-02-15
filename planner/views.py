@@ -40,6 +40,54 @@ GOAL_FORMS = {
 	}
 
 
+
+def home(request):
+	"""home screen"""
+	# Get a list of the user's activities to display on home screen
+	profile = get_profile(request.user)
+	# Get User schedule
+	#  If no schedule yet, returns 0, schedule section in template empty
+	schedule = get_schedule(request.user)
+	
+	# Get user's activities for home screen list
+	activities = Activity.objects.filter(owner=request.user)
+	
+	context = {
+	'activities':activities,
+	'profile':profile,
+	'schedule':schedule
+		}
+	return render(request,'planner/home.html', context)
+
+def generate_schedule(request):
+	"""Generate new schedule for user and render home screen"""
+
+	profile = get_profile(request.user)
+	schedule = []
+	for i in range(20):
+		day_delta = timedelta(days=i)
+		day = Day(
+			date=date.today()+day_delta,
+			rest=True,
+			)
+		schedule.append(Day)
+
+	schedule_json = json.dumps(schedule)
+	profile.schedule = schedule_json
+	profile.save()	
+
+def get_schedule(user):
+	"""Returns saved schedule object for user, returns 0 if none."""
+	
+	profile = get_profile(user)
+	if profile.schedule:
+
+		schedule = json.loads(profile.schedule)
+		return schedule	
+	
+	else:
+		return 0
+
 def testview(request):
 	"""for testing"""
 	return render(request,'planner/testtemplate.html')
@@ -64,18 +112,6 @@ def submit(request, act_id=None):
 
 		# Set act values to form values, save, redirect
 
-def get_schedule(user):
-	"""Returns schedule object as is for user"""
-	
-	profile = get_profile(user)
-	if profile.schedule:
-
-		schedule = json.loads(profile.schedule)
-		return schedule	
-	
-	else:
-		return 0
-
 
 
 
@@ -83,7 +119,7 @@ def get_schedule(user):
 
 
 def get_profile(user):
-	"""generates profile object for the user, if none found inits one"""
+	"""return profile object for user, if none found inits one"""
 	try:
 		profile = Profile.objects.get(owner=user)
 	except:
@@ -150,38 +186,9 @@ def delete(request, act_id=None):
 		return redirect('planner:home')
 
 
-def test_schedule():
-	"""use this for generating test schedules"""
-	# Test one - generate a schedule of 14 Rest days
-	test = []
-	for x in range(0,14):
-		day = Day(date=date.today(),rest=True)
-		day.date += timedelta(x)
-		test.append(day)
-	return test
 
-def home(request):
-	"""home screen"""
-	# Get a list of the user's activities to display on home screen
-	profile = get_profile(request.user)
-
-
-	# ALL checks / adjustment / saving etc should be done in get_schedule
-	tester = test_schedule()
-	difference = (tester[0].date - date.today()).days
-	# Check / ammend schedule
-
-
-
-	activities = Activity.objects.filter(owner=request.user)
 	
-	context = {
-	'difference':difference,
-	'activities':activities,
-	'tester':tester,
-	'profile':profile,
-		}
-	return render(request,'planner/home.html', context)
+
 
 
 def setgoal(request):
