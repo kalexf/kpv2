@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import json
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
 	Profile, Day )
 from .forms import PR_Form, Int_Form, TT_Form, CT_Form
 from .forms import PR_Goal_Form, Int_Goal_Form, TT_Goal_Form, SubmissionForm
- #timedelta
 
 
 
@@ -48,7 +47,11 @@ def home(request):
 	# Get User schedule
 	#  If no schedule yet, returns 0, schedule section in template empty
 	schedule = get_schedule(request.user)
-	
+	# If user has schedule, convert to version for viewing in schedule table
+	# on home page. 
+
+
+
 	# Get user's activities for home screen list
 	activities = Activity.objects.filter(owner=request.user)
 	
@@ -63,30 +66,51 @@ def generate_schedule(request):
 	"""Generate new schedule for user and render home screen"""
 
 	profile = get_profile(request.user)
-	schedule = []
-	for i in range(20):
-		day_delta = timedelta(days=i)
-		day = Day(
-			date=date.today()+day_delta,
-			rest=True,
-			)
-		schedule.append(Day)
+	schedule = {}
+	# Record year, month, day as ints to represent first day of schedule
+	# Setting to TODAY for testing but will need to be changed <?>
+	schedule['year'] = datetime.now().year
+	schedule['month'] = datetime.now().month
+	schedule['day'] = datetime.now().day
+	schedule['test'] = 'test'
+	# NUmber of days in schedule, currently hard-coded to 21 
+	schedule['length'] = 21
+	# add numbered items representing sequential days of schedule, set as 
+	# rest days initially
+	for i in range(0,20):
 
+		schedule[i]='R'
+
+
+	# Convert to json and save
 	schedule_json = json.dumps(schedule)
 	profile.schedule = schedule_json
 	profile.save()	
 
+	return redirect('planner:home')
+
 def get_schedule(user):
-	"""Returns saved schedule object for user, returns 0 if none."""
+	"""Gets user's saved scheduel json object and returns python list."""
 	
 	profile = get_profile(user)
 	if profile.schedule:
-
+		# get schedule json and convert to python
 		schedule = json.loads(profile.schedule)
+		# create list of individual days 
+		schedule_list = []
+		
+
 		return schedule	
 	
 	else:
 		return 0
+	
+	########
+	if schedule:
+		schedule_list = []
+		length = schedule['length']
+		# Create schedule list object
+		for day in length
 
 def testview(request):
 	"""for testing"""
