@@ -3,58 +3,65 @@
   {% extends 'planner/base.html' %}
     {% block content %}
       <h4>Home Page</h4>
-        {% if schedule %}
+        {% if schedule_list %}
             <p>--schedule--</p>
               <table>
+                
+                <!-- schedule week one -->
                 <tr>
-
-                  <th>Mon</th>
-                  <th>Tue</th>
-                  <th>Wed</th>
-                  <th>Thu</th>
-                  <th>Fri</th>
-                  <th>Sat</th>
-                  <th>Sun</th>
+                  {% for day in schedule_list|slice:":6" %}
+                  <td>
+                      {{day.date}}
+                      
+                  </td>
+                  {% endfor %}
                 </tr>
-                <!-- Schedule week one -->
                 <tr>
-                  <td>{{schedule.0.date_string}}</td>
-                  <td>{{schedule.1.date_string}}</td>
-                  <td>{{schedule.2.date_string}}</td>
-                  <td>{{schedule.3.date_string}}</td>
-                  <td>{{schedule.4.date_string}}</td>
-                  <td>{{schedule.5.date_string}}</td>
-                  <td>{{schedule.6.date_string}}</td>
-
+                  {% for day in schedule_list|slice:":6" %}
+                  <td>
+                      {{day.rest}}
+                      
+                  </td>
+                  {% endfor %}
                 </tr>
-                <!-- week 2 -->
                 <tr>
-                  <td>{{schedule.7.date_string}}</td>
-                  <td>{{schedule.8.date_string}}</td>
-                  <td>{{schedule.9.date_string}}</td>
-                  <td>{{schedule.10.date_string}}</td>
-                  <td>{{schedule.11.date_string}}</td>
-                  <td>{{schedule.12.date_string}}</td>
-                  <td>{{schedule.13.date_string}}</td>
-
+                  {% for day in schedule_list|slice:"7:13" %}
+                  <td>
+                      {{day.date}}
+                      
+                  </td>
+                  {% endfor %}
                 </tr>
-                <!-- week 3 -->
                 <tr>
-                  <td>{{schedule.14.date_string}}</td>
-                  <td>{{schedule.15.date_string}}</td>
-                  <td>{{schedule.16.date_string}}</td>
-                  <td>{{schedule.17.date_string}}</td>
-                  <td>{{schedule.18.date_string}}</td>
-                  <td>{{schedule.19.date_string}}</td>
-                  <td>{{schedule.20.date_string}}</td>
-
+                  {% for day in schedule_list|slice:"7:13" %}
+                  <td>
+                      {{day.rest}}
+                      
+                  </td>
+                  {% endfor %}
                 </tr>
-
+                <tr>
+                  {% for day in schedule_list|slice:"14:20" %}
+                  <td>
+                      {{day.date}}
+                      
+                  </td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  {% for day in schedule_list|slice:"14:20" %}
+                  <td>
+                      {{day.rest}}
+                      
+                  </td>
+                  {% endfor %}
+                </tr>
+                
                   
             </table>  
         {% endif %}   
-            <p>generate new schedule</p>
-              <a href="{% url 'planner:generate' %}">Generate New Schedule</a>
+            <p>generate new schedule_list</p>
+              <a href="{% url 'planner:generate' %}">Generate New schedule_list</a>
 
             <p>User Activites</p>
               <table>
@@ -78,8 +85,7 @@
     <hr>
 
     <p>TESTS,</p>
-    <p>test date - {{test_date}}</p>
-    <p>test date string - {{test_date_string}}</p>
+    <p>test schedule_list - {{schedule_list}}</p>
 
        
 

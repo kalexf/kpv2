@@ -46,7 +46,7 @@ def home(request):
 	profile = get_profile(request.user)
 	# Get User schedule
 	#  If no schedule yet, returns 0, schedule section in template empty
-	schedule = get_schedule(request.user)
+	schedule_list = get_schedule(request.user)
 	# If user has schedule, convert to version for viewing in schedule table
 	# on home page. 
 
@@ -58,7 +58,7 @@ def home(request):
 	context = {
 	'activities':activities,
 	'profile':profile,
-	'schedule':schedule
+	'schedule_list':schedule_list
 		}
 	return render(request,'planner/home.html', context)
 
@@ -77,11 +77,9 @@ def generate_schedule(request):
 	schedule['length'] = 21
 	# add numbered items representing sequential days of schedule, set as 
 	# rest days initially
-	for i in range(0,20):
+	for i in range(0,21):
 
 		schedule[i]='R'
-
-
 	# Convert to json and save
 	schedule_json = json.dumps(schedule)
 	profile.schedule = schedule_json
@@ -90,7 +88,7 @@ def generate_schedule(request):
 	return redirect('planner:home')
 
 def get_schedule(user):
-	"""Gets user's saved scheduel json object and returns python list."""
+	"""Converts user's saved schedule to list for display on home screen table"""
 	
 	profile = get_profile(user)
 	if profile.schedule:
@@ -99,18 +97,22 @@ def get_schedule(user):
 		# create list of individual days 
 		schedule_list = []
 		
+		start_day = date(
+			year=schedule['year'],
+			month=schedule['month'],
+			day=schedule['day'],
+			)
+		length =  schedule['length']
+		
+		for i in range(length):
+			day = Day(date=start_day+timedelta(days=i))
+			schedule_list.append(day)
 
-		return schedule	
+		return schedule_list	
 	
 	else:
 		return 0
 	
-	########
-	if schedule:
-		schedule_list = []
-		length = schedule['length']
-		# Create schedule list object
-		for day in length
 
 def testview(request):
 	"""for testing"""
