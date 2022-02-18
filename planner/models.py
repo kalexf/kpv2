@@ -74,7 +74,20 @@ class Profile(models.Model):
 		default='Monday',
 		choices=DOW_CHOICES
 		)
-
+	# Aimed for weekly distance (limit)
+	mileage_target = models.DecimalField(
+		max_digits=5,
+		decimal_places=2,
+		null=True,
+		blank=True,
+		)
+	# Mileage to date for current week
+	mileage = models.DecimalField(null=True,max_digits=5,decimal_places=2)
+	# How much mileage to add per week
+	mileage_increment = models.DecimalField(
+		max_digits=5,
+		decimal_places=2,
+		default=0.0)
 
 
 class Day:
@@ -97,8 +110,13 @@ class Day:
 # Parent class for all exercise types. All required fields / attributes here,
 # exercise-specific fields / attributes / methods go on exercise sub-classes.
 class Activity(models.Model):
-	"""Parent class for all exercise types, contains attributes common to all,
-	as well as anythin used by recommendation function"""
+	"""
+	Parent class for all exercise types, contains attributes common to all,
+	as well as anythin used by recommendation function
+	"""
+	class Meta:
+		ordering = ['last_done']
+		# By default returns objects with oldest first
 	# User readable description of the activity for display on home screen & schedule
 	name = models.CharField(max_length=40,default='namenlose')
 	# User the activity is connected to
@@ -111,7 +129,10 @@ class Activity(models.Model):
 		null=True,
 		blank=True,
 		)
-	difficulty = models.CharField(max_length=1,choices=DIFF_CHOICES,default='2')
+	difficulty = models.CharField(
+		max_length=1,
+		choices=DIFF_CHOICES,
+		default='2')
 	# Date Activity was last performed
 	last_done = models.DateField(null=True)
 	# Whether act increases difficulty / length over time

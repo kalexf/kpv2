@@ -89,6 +89,8 @@ def generate_schedule(request):
 
 	profile = get_profile(request.user)
 	schedule = {}
+	# Schedule is dict with keys representing needed information as well
+	# as integer keys 0-20 representing days.
 	# Record year, month, day as ints to represent first day of schedule
 	# Setting to TODAY for testing but will need to be changed <?>
 	# 
@@ -96,32 +98,78 @@ def generate_schedule(request):
 	schedule['month'] = datetime.now().month
 	schedule['day'] = datetime.now().day
 	schedule['test'] = 'test'
-	# NUmber of days in schedule, currently hard-coded to 21 
+	# NUmber of days in schedule, currently hard-coded to 21
+	# nb length = numbered 'day' units not total number of keys 
 	schedule['length'] = 21
 	# add numbered items representing sequential days of schedule, set as 
 	# rest days initially
+	# (this loop could be removed)
+	profilecopy = profile
+
 	for i in range(0,21):
 
 		schedule[i]='R'
 
-	activities = Activity.objects.filter(owner=request.user)
+	activities = Activity.objects.filter(
+		owner=request.user)
 
-	for day in schedule:
-		pass
-	 ##TODO!!!##
+	day_count = 0
+	
+	for i in range(0,schedule['length']):
+		# Iterating over each numbered day object in sch, initially set to
+		# 'r' but assinging integer value representing activity id number
+		# when an activity passes tests
+		day_count += 1
+		if day_count == 7:
+			day_count = 0
+			profilecopy.mileage = 0
+			profilecopy.mileage_target += profilecopy.mileage_increment
+		
+		day = schedule[i]
+		# Run through acts array checking if any can pass algo
+		for act in activities:
+			
+			if act.last_done:
+				days_delta = (date.today() + timedelta(days=i)) - act.last_done
+				if days_delta < act.frequency:
+					continue
+			if profilecopy.mileage_target:
+				
+				if profilecopy.mileage:
+					mile_delta = profilecopy.mileage_target - profilecopy.mileage
+						
+					if act.distance > mile_delta:
+						continue
+			# As of now this will ignore sch 1st day re: today / yesterday
+			# Need extra check clause where i = 0
+			if i > 0:
+				if schedule[i-1] != 'R':
 
 
+					if act.difficulty == 3:
+						continue
+					elif act.difficulty == 2:
+						prev_act = get_act(schedule[i-1].id)
+						if pre_act.difficulty != 1:
+							continue
+			# All tests passed for current act				
+			schedule[i] = act.id
+			act.last_done = date.today() + timedelta(days=i)
+			if act.distance:
+				profilecopy.mileage += act.distance
+			continue
 
-	# Convert to json and save
 	schedule_json = json.dumps(schedule)
 	profile.schedule = schedule_json
 	profile.save()	
 
 	return redirect('planner:home')
 
+
 def get_schedule(user):
 	"""Converts user's saved schedule to list for display on home screen table"""
-	
+	# Should probably be refactored to discreet function which will return
+	# needed structure / vars
 	profile = get_profile(user)
 	if profile.schedule:
 		# get schedule json and convert to python

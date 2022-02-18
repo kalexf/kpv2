@@ -14,10 +14,15 @@ class Profile_Form(forms.ModelForm):
 	class Meta:
 		model = Profile
 		fields = [
-		'start_day'
+		'start_day',
+		'mileage_target',
+		'mileage_increment'
 		]
 		labels = {
-		'start_day':'Initial Day of week for new schedules'
+		'start_day':'Initial Day of week for new schedules',
+		'mileage_target':'Weekly distance target (km)',
+		'mileage_increment':'Weekly distance increase (km).'
+		
 		}
 		
 
