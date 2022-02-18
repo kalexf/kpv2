@@ -1,13 +1,25 @@
 from django import forms
 
-from .models import Activity, PacedRun, Intervals, TimeTrial, CrossTrain
-from .models import DIFF_CHOICES
+from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
+	Profile)
+from .models import DIFF_CHOICES, DOW_CHOICES
 
 # Forms for creating new Activity instances- fields vary depending on activity type
 
 
-
-
+class Profile_Form(forms.ModelForm):
+	"""
+	Form for editing user profile preferences
+	"""
+	class Meta:
+		model = Profile
+		fields = [
+		'start_day'
+		]
+		labels = {
+		'start_day':'Initial Day of week for new schedules'
+		}
+		
 
 class PR_Form(forms.ModelForm):
 	class Meta:
@@ -62,7 +74,6 @@ class CT_Form(forms.ModelForm):
 		labels = {
 		'exercise_type':'Activity Name'
 		}		
-
 
 class SubmissionForm(forms.Form):
 	"""Form for entering details of completed activities"""

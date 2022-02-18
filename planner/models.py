@@ -39,23 +39,44 @@ PACE_CHOICES = [
 	(PACES[3], PACE_LABELS[3]),
 	(PACES[4], PACE_LABELS[4]),
 		]
-# Perceived difficulty of the activity, used in building schedule. Used by DB 
-# models and submission Form
+# Perceived difficulty of the activity, used in building schedule. Used by 
+# DB models and submission Form
 
-DIFF_CHOICES = [('1','Easy'),('2','Moderate'),('3','Hard')]
+DIFF_CHOICES = [
+	('1','Easy'),
+	('2','Moderate'),
+	('3','Hard')
+	]
+# Day of week choices iterable for profile preferences.
+DOW_CHOICES = [
+	('Monday','Monday'),
+	('Tuesday','Tuesday'),
+	('Wednesday','Wednesday'),
+	('Thursday','Thrusday'),
+	('Friday','Friday'),
+	('Saturday','Saturday'),
+	('Sunday','Sunday')
+	]
 
 class Profile(models.Model):
 	"""Stores information about user used to generate schedule and track
 	statistics. Any information not related to a specific activity saved here"""
-	owner = models.ForeignKey(User, on_delete=models.CASCADE)
+	owner = models.ForeignKey(
+		User, 
+		on_delete=models.CASCADE
+		)
 	# Python object converted to JSON which holds user's schedule information
 	schedule = models.JSONField(null=True)
 	last_exercise = models.DateField(null=True)
+	# Day of week used as initial day for new schedule.
+	start_day = models.CharField(
+		max_length=10,
+		default='Monday',
+		choices=DOW_CHOICES
+		)
 
-#### SCHEDULE OBJECTS ####
 
 
-### not certain which attrs will be needed yet ###
 class Day:
 	"""Contains information relating to a specific day"""	
 	def __init__(self, date, rest=True, act_id=None, complete=False):
@@ -134,7 +155,10 @@ class PacedRun(Activity):
 	prog_distance = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
 
 	# Pace / relative exertion the activity is done at
-	pace = models.CharField(max_length=18, choices=PACE_CHOICES, default=PACES[2])	
+	pace = models.CharField(
+		max_length=18, 
+		choices=PACE_CHOICES, 
+		default=PACES[2])	
 	# Length of activity time in minutes
 	minutes = models.PositiveSmallIntegerField(
 		null=True,

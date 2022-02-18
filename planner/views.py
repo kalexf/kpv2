@@ -4,8 +4,8 @@ import json
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
 	Profile, Day )
-from .forms import PR_Form, Int_Form, TT_Form, CT_Form
-from .forms import PR_Goal_Form, Int_Goal_Form, TT_Goal_Form, SubmissionForm
+from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
+	Int_Goal_Form, TT_Goal_Form, SubmissionForm, Profile_Form)
 
 
 
@@ -62,6 +62,28 @@ def home(request):
 		}
 	return render(request,'planner/home.html', context)
 
+def settings(request):
+	"""
+	Returns settings page for profile /schedule.
+
+	"""
+	profile = get_profile(request.user)
+	
+	if request.method != 'POST':
+
+		form = Profile_Form(instance=profile)
+		context = {'form':form}
+
+		return render(request,'planner/profilesettings.html',context)
+
+	else:
+		##
+		form = Profile_Form(instance=profile,data=request.POST)
+		form.save()
+		return redirect('planner:home')
+
+
+
 def generate_schedule(request):
 	"""Generate new schedule for user and render home screen"""
 
@@ -69,6 +91,7 @@ def generate_schedule(request):
 	schedule = {}
 	# Record year, month, day as ints to represent first day of schedule
 	# Setting to TODAY for testing but will need to be changed <?>
+	# 
 	schedule['year'] = datetime.now().year
 	schedule['month'] = datetime.now().month
 	schedule['day'] = datetime.now().day
@@ -80,6 +103,15 @@ def generate_schedule(request):
 	for i in range(0,21):
 
 		schedule[i]='R'
+
+	activities = Activity.objects.filter(owner=request.user)
+
+	for day in schedule:
+		pass
+	 ##TODO!!!##
+
+
+
 	# Convert to json and save
 	schedule_json = json.dumps(schedule)
 	profile.schedule = schedule_json

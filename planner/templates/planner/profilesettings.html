@@ -3,6 +3,12 @@
 {% block content %}
 <!--Form page for editing personal settings, schedule settings -->
 {% if form %}
+<form action="{% url 'planner:settings' %}" method="post">
+  {% csrf_token %}
   {{form.as_p}}
+ <button name="submit">Save changes</button> 
+  <p>#SETTINGS FOR MILEAGE ETC. WILL GO HERE</p>
+</form> 
+{% endif %}  
 
 {% endblock content %}
