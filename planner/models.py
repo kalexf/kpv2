@@ -49,13 +49,13 @@ DIFF_CHOICES = [
 	]
 # Day of week choices iterable for profile preferences.
 DOW_CHOICES = [
-	('Monday','Monday'),
-	('Tuesday','Tuesday'),
-	('Wednesday','Wednesday'),
-	('Thursday','Thrusday'),
-	('Friday','Friday'),
-	('Saturday','Saturday'),
-	('Sunday','Sunday')
+	(0,'Monday'),
+	(1,'Tuesday'),
+	(2,'Wednesday'),
+	(3,'Thrusday'),
+	(4,'Friday'),
+	(5,'Saturday'),
+	(6,'Sunday')
 	]
 
 class Profile(models.Model):
@@ -69,9 +69,9 @@ class Profile(models.Model):
 	schedule = models.JSONField(null=True)
 	last_exercise = models.DateField(null=True)
 	# Day of week used as initial day for new schedule.
-	start_day = models.CharField(
-		max_length=10,
-		default='Monday',
+	start_day = models.PositiveSmallIntegerField(
+		
+		default=0,
 		choices=DOW_CHOICES
 		)
 	# Aimed for weekly distance (limit)

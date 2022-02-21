@@ -85,15 +85,16 @@ def settings(request):
 
 
 def generate_schedule(request):
-	"""Generate new schedule for user and render home screen"""
-
+	"""
+	Generate new schedule for user
+	"""
+	# Get User profile
 	profile = get_profile(request.user)
+	# Schedule object is python dictionary which will be covnerted to JSON
+	# and stored on user's Profile 
 	schedule = {}
-	# Schedule is dict with keys representing needed information as well
-	# as integer keys 0-20 representing days.
-	# Record year, month, day as ints to represent first day of schedule
-	# Setting to TODAY for testing but will need to be changed <?>
-	# 
+	
+	# The initial day of schedule
 	schedule['year'] = datetime.now().year
 	schedule['month'] = datetime.now().month
 	schedule['day'] = datetime.now().day
