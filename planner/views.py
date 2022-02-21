@@ -42,24 +42,24 @@ GOAL_FORMS = {
 
 def home(request):
 	"""home screen"""
-	# Get a list of the user's activities to display on home screen
-	profile = get_profile(request.user)
-	# Get User schedule
-	#  If no schedule yet, returns 0, schedule section in template empty
-	schedule_list = get_schedule(request.user)
-	# If user has schedule, convert to version for viewing in schedule table
-	# on home page. 
-
-
-
-	# Get user's activities for home screen list
-	activities = Activity.objects.filter(owner=request.user)
 	
-	context = {
-	'activities':activities,
-	'profile':profile,
-	'schedule_list':schedule_list
-		}
+	context = {}
+	# Get a list of the user's activities to display on home screen
+	if request.user.is_authenticated:
+		
+		# Get User profile
+		profile = get_profile(request.user)
+		#  If no schedule yet, returns 0, schedule section in template empty
+		schedule_list = get_schedule(request.user)
+		# Get user's activities for home screen list
+		activities = Activity.objects.filter(owner=request.user)
+	
+	
+		context['activities'] = activities
+		context['profile'] = profile
+		context['schedule_list'] = schedule_list
+
+	
 	return render(request,'planner/home.html', context)
 
 def settings(request):
@@ -131,11 +131,11 @@ def generate_schedule(request):
 			
 			if act.last_done:
 				days_delta = (date.today() + timedelta(days=i)) - act.last_done
-				if days_delta < act.frequency:
+				if days_delta.days < act.frequency:
 					continue
 			if profilecopy.mileage_target:
 				
-				if profilecopy.mileage:
+				if profilecopy.mileage and act.distance:
 					mile_delta = profilecopy.mileage_target - profilecopy.mileage
 						
 					if act.distance > mile_delta:
@@ -156,7 +156,12 @@ def generate_schedule(request):
 			schedule[i] = act.id
 			act.last_done = date.today() + timedelta(days=i)
 			if act.distance:
-				profilecopy.mileage += act.distance
+				if profilecopy.mileage:
+
+					profilecopy.mileage += act.distance
+				else:
+					profilecopy.mileage = act.distance
+
 			continue
 
 	schedule_json = json.dumps(schedule)
@@ -225,14 +230,20 @@ def submit(request, act_id=None):
 
 
 def get_profile(user):
-	"""return profile object for user, if none found inits one"""
-	try:
-		profile = Profile.objects.get(owner=user)
-	except:
-		profile = Profile(owner=user)
-		profile.save()	
+	"""
+	Return profile object for user, if none found inits one. If not logged in
+	returns 0 
+	"""
+	if user.is_authenticated:
+		try:
+			profile = Profile.objects.get(owner=user)
+		except:
+			profile = Profile(owner=user)
+			profile.save()	
 
-	return profile 
+		return profile
+	else:
+		return 0	 
 
 
 def edit(request,act_id=None):

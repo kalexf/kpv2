@@ -2,6 +2,7 @@
 
   {% extends 'planner/base.html' %}
     {% block content %}
+      {% if user.is_authenticated %} <!-- Contains entire page -->
       <h4>Home Page</h4>
         {% if schedule_list %}
             <p>--schedule--</p>
@@ -80,6 +81,7 @@
                   </tr>
                  {% endfor %}
               </table>      
+    }
 
     <p>edit user settings/ preferences</p>
     <h4>Add exercises</h4>
@@ -91,6 +93,7 @@
     <p>test schedule_list - {{schedule_list}}</p>
 
        
+  {% else %} <p>Please log in /register </p>
+  {% endif %} 
 
     {% endblock content %}
-
