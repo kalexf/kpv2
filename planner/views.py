@@ -41,7 +41,10 @@ GOAL_FORMS = {
 
 
 def home(request):
-	"""home screen"""
+	"""
+	Displays schedule, activities, links for edit/ creation screen.
+	"""
+	##Testing
 	
 	context = {}
 	# Get a list of the user's activities to display on home screen
@@ -82,6 +85,22 @@ def settings(request):
 		form.save()
 		return redirect('planner:home')
 
+def next_day_instance(day_integer):
+	"""
+	Given an integer 0-6 representing day of week, returns the next calendar
+	isntance of that day (including today).
+	"""
+	# Run though next 7 days until correct day found
+	try:
+		for i in range(0,7):
+
+			day = date.today() + timedelta(days=i)
+			if day.weekday() == day_integer:
+				# Return python date object for correct day
+				return day
+	# Will only fail if something other than int 0-6 passed as arg
+	except:
+		return 0			
 
 
 def generate_schedule(request):
@@ -90,27 +109,30 @@ def generate_schedule(request):
 	"""
 	# Get User profile
 	profile = get_profile(request.user)
+	# Profile copy is used to temporarily store changed values while scheduling
+	profilecopy = profile
 	# Schedule object is python dictionary which will be covnerted to JSON
 	# and stored on user's Profile 
 	schedule = {}
-	
-	# The initial day of schedule
-	schedule['year'] = datetime.now().year
-	schedule['month'] = datetime.now().month
-	schedule['day'] = datetime.now().day
-	schedule['test'] = 'test'
-	# NUmber of days in schedule, currently hard-coded to 21
-	# nb length = numbered 'day' units not total number of keys 
+	# Get date object corresponding to next calendar date where the day of
+	# week corresponds to day of week setting in user profile
+	start_date = next_day_instance(profile.start_day)
+	# Set dictionary date value to this date (saved this way so it can be more
+	# easily serialized to JSON)
+	schedule['year'] = start_date.year
+	schedule['month'] = start_date.month
+	schedule['day'] = start_date.day
+	# Number of days in schedule, currently hard-coded to 21
+	# length = numbered 'day' objects not total number of keys in dictionary 
 	schedule['length'] = 21
 	# add numbered items representing sequential days of schedule, set as 
 	# rest days initially
 	# (this loop could be removed)
-	profilecopy = profile
 
 	for i in range(0,21):
 
 		schedule[i]='R'
-
+	# Get all of user activities
 	activities = Activity.objects.filter(
 		owner=request.user)
 
@@ -120,38 +142,53 @@ def generate_schedule(request):
 		# Iterating over each numbered day object in sch, initially set to
 		# 'r' but assinging integer value representing activity id number
 		# when an activity passes tests
+		# When i == 7 a full week has been scheduled, values can be reset 
 		day_count += 1
 		if day_count == 7:
 			day_count = 0
 			profilecopy.mileage = 0
-			profilecopy.mileage_target += profilecopy.mileage_increment
+			if profilecopy.mileage_target:
+				profilecopy.mileage_target += profilecopy.mileage_increment
 		
-		day = schedule[i]
+	
 		# Run through acts array checking if any can pass algo
 		for act in activities:
 			
 			if act.last_done:
-				days_delta = (date.today() + timedelta(days=i)) - act.last_done
+				# Calculate if number of days passed since activity was last done
+				# is greater than the activity's frequency value.
+
+				days_delta = (start_date + timedelta(days=i)) - act.last_done
 				if days_delta.days < act.frequency:
+					# Not enough time passed, continue to next act in loop
 					continue
+			
 			if profilecopy.mileage_target:
-				
+			# check whether performing the activity would put the user over
+			# their mileage target / limit		
+				# Will not check unless the activity actually has a distance 
+				# value
 				if profilecopy.mileage and act.distance:
 					mile_delta = profilecopy.mileage_target - profilecopy.mileage
 						
 					if act.distance > mile_delta:
+						# Mileage too large, continue
 						continue
-			# As of now this will ignore sch 1st day re: today / yesterday
-			# Need extra check clause where i = 0
+
 			if i > 0:
+
 				if schedule[i-1] != 'R':
 
-
+					# Will not schedule difficult activity unless previous day
+					# was rest
 					if act.difficulty == 3:
 						continue
+
 					elif act.difficulty == 2:
-						prev_act = get_act(schedule[i-1].id)
-						if pre_act.difficulty != 1:
+						# This is not working?
+						prev_act = get_act(schedule[i-1])
+						if prev_act.difficulty != 1:
+			
 							continue
 			# All tests passed for current act				
 			schedule[i] = act.id
