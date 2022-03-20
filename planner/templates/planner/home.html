@@ -12,7 +12,7 @@
                 <tr>
                   {% for day in schedule_list|slice:":6" %}
                   <td>
-                      {{day.date}}
+                      {{day.date|date:"D d M"}}
                       
                   </td>
                   {% endfor %}
@@ -20,7 +20,7 @@
                 <tr>
                   {% for day in schedule_list|slice:":6" %}
                   <td>
-                      {{day.rest}}
+                      {% if day.rest %} Rest Day {% endif %}
                       
                   </td>
                   {% endfor %}
@@ -28,7 +28,7 @@
                 <tr>
                   {% for day in schedule_list|slice:"7:13" %}
                   <td>
-                      {{day.date}}
+                      {{day.date|date:"D d M"}}
                       
                   </td>
                   {% endfor %}
@@ -36,27 +36,12 @@
                 <tr>
                   {% for day in schedule_list|slice:"7:13" %}
                   <td>
-                      {{day.rest}}
+                    {% if day.rest %} Rest Day {% endif %}
+                    
                       
                   </td>
                   {% endfor %}
-                </tr>
-                <tr>
-                  {% for day in schedule_list|slice:"14:20" %}
-                  <td>
-                      {{day.date}}
-                      
-                  </td>
-                  {% endfor %}
-                </tr>
-                <tr>
-                  {% for day in schedule_list|slice:"14:20" %}
-                  <td>
-                      {{day.rest}}
-                      
-                  </td>
-                  {% endfor %}
-                </tr>
+               
                 
                   
             </table>  

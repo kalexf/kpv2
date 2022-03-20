@@ -91,18 +91,10 @@ class Profile(models.Model):
 
 
 class Day:
-	"""Contains information relating to a specific day"""	
-	def __init__(self, date, rest=True, act_id=None, complete=False):
-		# Set initial values
-		# Is a rest day
-		self.rest = rest
-		if self.rest == False:
-			# Activity the objrct relates to
-			self.act_id = act_id
-		# Calendar date the obj relates to
+	"""Contains information relating to a specific schedule day"""	
+	def __init__(self, date):
+		# Calendar date the day relates to.
 		self.date = date
-		# Whether the activity has been completed
-		self.complete = complete 	
 
 
 

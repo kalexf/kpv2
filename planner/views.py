@@ -105,104 +105,35 @@ def next_day_instance(day_integer):
 
 def generate_schedule(request):
 	"""
-	Generate new schedule for user
+	Generates new schedule for user, saves as JSON, redirects to home.
 	"""
 	# Get User profile
 	profile = get_profile(request.user)
-	# Profile copy is used to temporarily store changed values while scheduling
-	profilecopy = profile
-	# Schedule object is python dictionary which will be covnerted to JSON
-	# and stored on user's Profile 
-	schedule = {}
+	# make test schedule
+	test_schedule = {}
+	# Start date for schedule set using initial start day preference from
+	# profile, default Monday
+	start_date = next_day_instance(profile.start_day)
+
+	
 	# Get date object corresponding to next calendar date where the day of
 	# week corresponds to day of week setting in user profile
 	start_date = next_day_instance(profile.start_day)
 	# Set dictionary date value to this date (saved this way so it can be more
 	# easily serialized to JSON)
-	schedule['year'] = start_date.year
-	schedule['month'] = start_date.month
-	schedule['day'] = start_date.day
-	# Number of days in schedule, currently hard-coded to 21
-	# length = numbered 'day' objects not total number of keys in dictionary 
-	schedule['length'] = 21
-	# add numbered items representing sequential days of schedule, set as 
-	# rest days initially
-	# (this loop could be removed)
-
-	for i in range(0,21):
-
-		schedule[i]='R'
-	# Get all of user activities
-	activities = Activity.objects.filter(
-		owner=request.user)
-
-	day_count = 0
+	test_schedule['year'] = start_date.year
+	test_schedule['month'] = start_date.month
+	test_schedule['day'] = start_date.day
 	
-	for i in range(0,schedule['length']):
-		# Iterating over each numbered day object in sch, initially set to
-		# 'r' but assinging integer value representing activity id number
-		# when an activity passes tests
-		# When i == 7 a full week has been scheduled, values can be reset 
-		day_count += 1
-		if day_count == 7:
-			day_count = 0
-			profilecopy.mileage = 0
-			if profilecopy.mileage_target:
-				profilecopy.mileage_target += profilecopy.mileage_increment
-		
+
+	# Number of days in schedule, currently hard-coded to 28
+	# Set all to rest for test_schedule
+	for i in range(0,28):
+
+		test_schedule[i]='REST'
 	
-		# Run through acts array checking if any can pass algo
-		for act in activities:
-			
-			if act.last_done:
-				# Calculate if number of days passed since activity was last done
-				# is greater than the activity's frequency value.
 
-				days_delta = (start_date + timedelta(days=i)) - act.last_done
-				if days_delta.days < act.frequency:
-					# Not enough time passed, continue to next act in loop
-					continue
-			
-			if profilecopy.mileage_target:
-			# check whether performing the activity would put the user over
-			# their mileage target / limit		
-				# Will not check unless the activity actually has a distance 
-				# value
-				if profilecopy.mileage and act.distance:
-					mile_delta = profilecopy.mileage_target - profilecopy.mileage
-						
-					if act.distance > mile_delta:
-						# Mileage too large, continue
-						continue
-
-			if i > 0:
-
-				if schedule[i-1] != 'R':
-
-					# Will not schedule difficult activity unless previous day
-					# was rest
-					if act.difficulty == 3:
-						continue
-
-					elif act.difficulty == 2:
-						# This is not working?
-						prev_act = get_act(schedule[i-1])
-						if prev_act.difficulty != 1:
-			
-							continue
-			# All tests passed for current act				
-			schedule[i] = act.id
-			act.last_done = date.today() + timedelta(days=i)
-			if act.distance:
-				if profilecopy.mileage:
-
-					profilecopy.mileage += act.distance
-				else:
-					profilecopy.mileage = act.distance
-
-			continue
-
-	schedule_json = json.dumps(schedule)
+	schedule_json = json.dumps(test_schedule)
 	profile.schedule = schedule_json
 	profile.save()	
 
@@ -210,25 +141,38 @@ def generate_schedule(request):
 
 
 def get_schedule(user):
-	"""Converts user's saved schedule to list for display on home screen table"""
-	# Should probably be refactored to discreet function which will return
-	# needed structure / vars
+	"""
+	Converts user's saved schedule to list of 'day' objects 
+	for display on home screen table
+	"""
+	# TO REDO - BROKEN BY CHANGE TO SCHEDULE GENERATE
+
+
 	profile = get_profile(user)
+
+	# Return schedule list if user has schedule, if user does not have schedule
+	# then space will be left blank
 	if profile.schedule:
-		# get schedule json and convert to python
+		# get schedule json and convert to python dictionary
 		schedule = json.loads(profile.schedule)
-		# create list of individual days 
+		# Empty list to hold 'day' objects representing individual schedule days
 		schedule_list = []
-		
+		# Initial day - calendar date of first day on schedule, will be a monday
+		# by default
 		start_day = date(
 			year=schedule['year'],
 			month=schedule['month'],
 			day=schedule['day'],
 			)
-		length =  schedule['length']
-		
+		length =  28
+
+		# FOR TEST, ALL DAYS SET TO REST
+
 		for i in range(length):
-			day = Day(date=start_day+timedelta(days=i))
+			day = Day(
+				date=start_day+timedelta(days=i),
+				)
+			day.rest=True
 			schedule_list.append(day)
 
 		return schedule_list	
