@@ -3,82 +3,74 @@
   {% extends 'planner/base.html' %}
     {% block content %}
       {% if user.is_authenticated %} <!-- Contains entire page -->
-      <h4>Home Page</h4>
         {% if schedule_list %}
-            <p>--schedule--</p>
-              <table>
-                
-                <!-- schedule week one -->
-                <tr>
-                  {% for day in schedule_list|slice:":6" %}
-                  <td>
-                      {{day.date|date:"D d M"}}
-                      
-                  </td>
-                  {% endfor %}
-                </tr>
-                <tr>
-                  {% for day in schedule_list|slice:":6" %}
-                  <td>
-                      {% if day.rest %} Rest Day {% endif %}
-                      
-                  </td>
-                  {% endfor %}
-                </tr>
-                <tr>
-                  {% for day in schedule_list|slice:"7:13" %}
-                  <td>
-                      {{day.date|date:"D d M"}}
-                      
-                  </td>
-                  {% endfor %}
-                </tr>
-                <tr>
-                  {% for day in schedule_list|slice:"7:13" %}
-                  <td>
+          <h4>User Schedule</h4>
+            <table>
+              <!-- schedule week one -->
+              <tr>
+                {% for day in schedule_list|slice:":6" %}
+                <td>
+                    {{day.date|date:"D d M"}}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                {% for day in schedule_list|slice:":6" %}
+                <td>
                     {% if day.rest %} Rest Day {% endif %}
-                    
-                      
-                  </td>
-                  {% endfor %}
-               
-                
-                  
+                </td>
+                {% endfor %}
+              </tr>
+              <!-- schedule week two -->
+              <tr>
+                {% for day in schedule_list|slice:"7:13" %}
+                <td>
+                    {{day.date|date:"D d M"}}
+                </td>
+                {% endfor %}
+              </tr>
+              <tr>
+                {% for day in schedule_list|slice:"7:13" %}
+                <td>
+                  {% if day.rest %} Rest Day {% endif %}
+                </td>
+                {% endfor %}
             </table>  
+                
         {% endif %}   
-            <p>generate new schedule_list</p>
-              <a href="{% url 'planner:generate' %}">Generate New schedule_list</a>
-            <p>Edit settings</p>
-            <a href="{% url 'planner:settings' %}">Edit User / schedule settings</a>
+        <!-- links for creating / editing profile and schedule-->
+        <p>
+          <a href="{% url 'planner:generate' %}">Create / Edit Schedule</a>
+        </p>  
+        <p>    
+          <a href="{% url 'planner:settings' %}">Edit User Preferences</a>
+        </p>  
 
+        <!--Individual Activities and links for editing / submitting them -->
+        <h4>User Activites</h4>
+          <table>
+            <tr>
+              <th>Name</th>
+            </tr>
+              {% for act in activities %}
+            <tr>
+              <td>{{act.name}}</td>
+              <td><a href="{% url 'planner:submit' act.id %}">Completed</td>
+              <td><a href="{% url 'planner:edit' act.id%}">Edit</a></td>
+              <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
+            </tr>
+              {% endfor %}
+          </table>      
+      
 
-            <p>User Activites</p>
-              <table>
-                <tr>
-                  <th>Name</th>
-                </tr>
-                {% for act in activities %}
-                  <tr>
-                    <td>{{act.name}}</td>
-                    <td><a href="{% url 'planner:submit' act.id %}">Completed</td>
-                    <td><a href="{% url 'planner:edit' act.id%}">Edit</a></td>
-                    <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
-                  </tr>
-                 {% endfor %}
-              </table>      
-    }
+        
+        <h4>Add exercises</h4>
+          <a href="{% url 'planner:addnew' %}">Create New Activity</a>
 
-    <p>edit user settings/ preferences</p>
-    <h4>Add exercises</h4>
-      <a href="{% url 'planner:addnew' %}">Create New Activity</a>
-
-    <hr>
-
-    <p>TESTS,</p>
-    {{test_date}}
+    
 
        
-  {% else %} <p>Please log in /register </p>
-  {% endif %} 
+       {% else %} <p>Please log in /register </p>
+       {% endif %} 
 
     {% endblock content %}
