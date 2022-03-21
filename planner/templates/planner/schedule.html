@@ -1,0 +1,81 @@
+{% extends 'planner/base.html' %}
+
+{% block content %}
+
+<!-- Table of inputs -->
+<!-- 
+  
+  DAYLIST - ['Monday', 'Tuesday' (...)] - for titling the individual cells
+
+  NUMBERLIST - [0,1] (ie a python range() object) - corresponding to individual days in schedule 
+
+    should be array of sequential INTS of same length as sch_list sent as context -->
+<!-- 
+  ACTIVITIES - contains activity ids and their corresponding name - for populating select menus 
+  array of dictionaries
+  [
+    {'id':'REST','name':'Rest day'},
+    {'id':act_id}:{'name'Act_name'},
+    (etc)
+
+  ] 
+
+-->
+<!-- form submission will return dictionary mapping ints to either act IDs or eg REST-->  
+  <form method="post" action="{% url 'planner:generate' 'save' %}">
+    <table>
+      <!--Table size dependent on schedule_list size -->
+      <!-- week one -->
+      <tr>
+        <!-- names of days for given week -->
+        {% for DAY in DAYLIST|slice:":6" %}
+          <td>{{DAY}}</td>
+        {% endfor %}
+      </tr>    
+      <tr>
+        <!-- select menus listing activities for each given day -->
+
+        {% for NUMBER in NUMBERLIST|slice:":6" %}
+          <td>
+            <!--nested for loop containing options-->
+            <select name="{{NUMBER}}">
+              {% for ACT in ACTIVITIES %}
+                <option value="{{ACT.id}}">{{ACT.name}}</option>  
+              {% endfor %}
+            </select>
+          </td>
+        {% endfor %}
+      </tr>
+      <!-- week two -->
+      <tr>
+        <!-- names of days for given week -->
+        {% for DAY in DAYLIST|slice:"7:13" %}
+          <td>{{DAY}}</td>
+        {% endfor %}
+      </tr>    
+      <tr>
+        <!-- select menus listing activities for each given day -->
+
+        {% for NUMBER in NUMBERLIST|slice:":6" %}
+          <td>
+            <!--nested for loop containing options-->
+            <select name="{{NUMBER}}">
+              {% for ACT in ACTIVITIES %}
+                <option value="{{ACT.id}}">{{ACT.name}}</option>  
+              {% endfor %}
+            </select>
+          </td>
+        {% endfor %}
+      </tr>
+    </table>
+    <button name="submit">Save Changes</button>
+
+  
+
+  </form>      
+
+
+
+
+
+{% endblock content %}
