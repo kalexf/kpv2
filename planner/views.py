@@ -112,19 +112,31 @@ def generate_schedule(request,route=''):
 	"""
 	profile = get_profile(request.user)
 	weeks = profile.schedule_length
-	TESTCHOICES = [('1','one'),('2','two'),('3','drei'),]
 	choices = get_schedule_choices(request.user)
+	
 	form = ScheduleForm(weeks,choices)
 	
+	if request.method == 'POST':
+		#check and save form
+		
+		form = ScheduleForm(weeks,choices,request.POST)
+		if form.is_valid():
+			#save to JSON
+			pass
+		
+
 	
 	
 	# CHANGE TO profile.schedule_length
 	context = {
-		'form':form,	
+		'form':form,
+
 		}
 	day_list = get_lists(weeks)
 	context.update(day_list)
 	
+	if request.method == 'POST':
+		context['data'] = request.POST
 
 	if route == 'edit':
 	# Request to edit schedule, render editing view

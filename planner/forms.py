@@ -21,10 +21,13 @@ class ScheduleForm(forms.Form):
 	DD menus for each field. 
 	"""
 
-	def __init__(self,weeks,choices):
+	def __init__(self,weeks,choices,initial_dict=None):
 		super(ScheduleForm,self).__init__()
 		for i in range(weeks * 7):
 			self.fields[f'day_{i+1}'] = forms.ChoiceField(choices=choices)
+		# if initial values have been given, set them
+		if initial_dict:
+			self.initial.update(initial_dict)
 
 			
 class Profile_Form(forms.ModelForm):
