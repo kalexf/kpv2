@@ -55,14 +55,14 @@ def home(request):
 		# Get User profile
 		profile = get_profile(request.user)
 		#  If no schedule yet, returns 0, schedule section in template empty
-		schedule_list = get_schedule(request.user)
+		
 		# Get user's activities for home screen list
 		activities = Activity.objects.filter(owner=request.user)
 	
 	
 		context['activities'] = activities
-		context['profile'] = profile
-		context['schedule_list'] = schedule_list
+		
+		
 
 	
 	return render(request,'planner/home.html', context)
@@ -113,16 +113,21 @@ def generate_schedule(request,route=''):
 	profile = get_profile(request.user)
 	weeks = profile.schedule_length
 	choices = get_schedule_choices(request.user)
-	
-	form = ScheduleForm(weeks,choices)
+	try:
+		initial_dict = json.loads(profile.schedule)
+	except:
+		initial_dict = {}
+	form = ScheduleForm(weeks,choices,initial_dict)
 	
 	if request.method == 'POST':
 		#check and save form
 		
 		form = ScheduleForm(weeks,choices,request.POST)
-		if form.is_valid():
-			#save to JSON
-			pass
+		schedule_dict = request.POST.dict()
+		schedule_dict.pop('csrfmiddlewaretoken')
+		schedule_dict.pop('submit')	
+		profile.schedule = json.dumps(schedule_dict)
+		profile.save()
 		
 
 	
@@ -174,45 +179,6 @@ def get_lists(weeks):
 	return day_dict	
 
 
-def get_schedule(user):
-	"""
-	Converts user's saved schedule to list of 'day' objects 
-	for display on home screen table
-	"""
-
-
-	profile = get_profile(user)
-
-	# Return schedule list if user has schedule, if user does not have schedule
-	# then space will be left blank
-	if profile.schedule:
-		# get schedule json and convert to python dictionary
-		schedule = json.loads(profile.schedule)
-		# Empty list to hold 'day' objects representing individual schedule days
-		schedule_list = []
-		# Initial day - calendar date of first day on schedule, will be a monday
-		# by default
-		start_day = date(
-			year=schedule['year'],
-			month=schedule['month'],
-			day=schedule['day'],
-			)
-		length =  28
-
-		# FOR TEST, ALL DAYS SET TO REST
-
-		for i in range(length):
-			day = Day(
-				date=start_day+timedelta(days=i),
-				)
-			day.rest=True
-			schedule_list.append(day)
-
-		return schedule_list	
-	
-	else:
-		return 0
-	
 
 def testview(request):
 	"""for testing"""
