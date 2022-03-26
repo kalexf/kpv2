@@ -2,11 +2,31 @@ from django import forms
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile)
-from .models import DIFF_CHOICES, DOW_CHOICES
-
-# Forms for creating new Activity instances- fields vary depending on activity type
+from .models import DIFF_CHOICES, DOW_CHOICES, WEEKS_CHOICES
 
 
+class TestForm(forms.Form):	
+
+	def __init__(self, weeks, choices):
+		super(TestForm,self).__init__()
+		for i in range(weeks * 7):
+			self.fields[f'day_{i}'] = forms.ChoiceField(choices=choices)
+
+
+class ScheduleForm(forms.Form):
+	"""
+	Dynamic form used for schedule creation page.
+	On init needs to be given integer 'weeks' which is used to determine
+	number of fields, and list of 2-tuples 'choices', which is used to create
+	DD menus for each field. 
+	"""
+
+	def __init__(self,weeks,choices):
+		super(ScheduleForm,self).__init__()
+		for i in range(weeks * 7):
+			self.fields[f'day_{i+1}'] = forms.ChoiceField(choices=choices)
+
+			
 class Profile_Form(forms.ModelForm):
 	"""
 	Form for editing user profile preferences
@@ -46,6 +66,8 @@ class PR_Form(forms.ModelForm):
 		widgets = {
 			'prog_value':forms.RadioSelect,
 		}
+
+# Forms for creating new Activity instances- fields vary depending on activity type
 class Int_Form(forms.ModelForm):
 	class Meta:
 		model = Intervals

@@ -5,7 +5,8 @@ import json
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
 	Profile, Day )
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
-	Int_Goal_Form, TT_Goal_Form, SubmissionForm, Profile_Form)
+	Int_Goal_Form, TT_Goal_Form, SubmissionForm, 
+	Profile_Form, TestForm, ScheduleForm )
 
 
 
@@ -37,6 +38,7 @@ GOAL_FORMS = {
 	ACT_TYPES[2].act_type:TT_Goal_Form,
 	
 	}
+
 
 
 
@@ -103,41 +105,61 @@ def next_day_instance(day_integer):
 		return 0			
 
 
-def generate_schedule(request):
+def generate_schedule(request,route=''):
 	"""
-	Generates new schedule for user, saves as JSON, redirects to home.
+	Returns Screen where user can build new schedule, saves cubmitted schedule
+	to user profile.
 	"""
-	# Get User profile
 	profile = get_profile(request.user)
-	# make test schedule
-	test_schedule = {}
-	# Start date for schedule set using initial start day preference from
-	# profile, default Monday
-	start_date = next_day_instance(profile.start_day)
-
+	weeks = profile.schedule_length
+	TESTCHOICES = [('1','one'),('2','two'),('3','drei'),]
+	choices = get_schedule_choices(request.user)
+	form = ScheduleForm(weeks,choices)
 	
-	# Get date object corresponding to next calendar date where the day of
-	# week corresponds to day of week setting in user profile
-	start_date = next_day_instance(profile.start_day)
-	# Set dictionary date value to this date (saved this way so it can be more
-	# easily serialized to JSON)
-	test_schedule['year'] = start_date.year
-	test_schedule['month'] = start_date.month
-	test_schedule['day'] = start_date.day
+	
+	
+	# CHANGE TO profile.schedule_length
+	context = {
+		'form':form,	
+		}
+	day_list = get_lists(weeks)
+	context.update(day_list)
 	
 
-	# Number of days in schedule, currently hard-coded to 28
-	# Set all to rest for test_schedule
-	for i in range(0,28):
+	if route == 'edit':
+	# Request to edit schedule, render editing view
+		pass
 
-		test_schedule[i]='REST'
 	
+	# submitted form, save values and redirect 	
+	if route == 'save':
+		pass
 
-	schedule_json = json.dumps(test_schedule)
-	profile.schedule = schedule_json
-	profile.save()	
 
-	return redirect('planner:home')
+	return render(request,'planner/schedule.html',context)
+
+def get_schedule_choices(user):
+	"""
+	Returns list of 2-tuples to use as choices field on schedule creation form.
+	The first default item is always a rest day
+	"""
+	choices = [('REST','Rest Day')]
+	activities = Activity.objects.filter(owner=user)
+	for act in activities:
+		
+		choices.append((act.id,act.name))
+	return choices	
+
+
+
+def get_lists(weeks):
+	"""Returns dictionary mapping Week_n to list of days """
+	days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun',]
+	day_dict = {}
+	for i in range(weeks):
+		day_dict[f'Week_{i+1}'] = days 
+
+	return day_dict	
 
 
 def get_schedule(user):
@@ -145,7 +167,6 @@ def get_schedule(user):
 	Converts user's saved schedule to list of 'day' objects 
 	for display on home screen table
 	"""
-	# TO REDO - BROKEN BY CHANGE TO SCHEDULE GENERATE
 
 
 	profile = get_profile(user)
@@ -183,7 +204,14 @@ def get_schedule(user):
 
 def testview(request):
 	"""for testing"""
-	return render(request,'planner/testtemplate.html')
+	TESTCHOICES = [('1','one'),('2','two'),('3','drei'),]
+	weeks = 2
+	form = TestForm(1,TESTCHOICES)
+
+	context = {'form':form}
+
+
+	return render(request,'planner/testtemplate.html',context)
 
 def submit(request, act_id=None):
 	"""Serve page where user can submit details of completed activity"""

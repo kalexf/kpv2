@@ -57,6 +57,13 @@ DOW_CHOICES = [
 	(5,'Saturday'),
 	(6,'Sunday')
 	]
+# Used for Number of weeks / schedule preference
+WEEKS_CHOICES = [
+		(1,'1 Week'),
+		(2,'2 Weeks'),
+		(4,'4 Weeks'),
+
+		]	
 
 class Profile(models.Model):
 	"""Stores information about user used to generate schedule and track
@@ -68,7 +75,10 @@ class Profile(models.Model):
 	# Python object converted to JSON which holds user's schedule information
 	schedule = models.JSONField(null=True)
 	last_exercise = models.DateField(null=True)
+	# How many weeks the schedule will run for
+	schedule_length = models.PositiveSmallIntegerField(default=1)
 	# Day of week used as initial day for new schedule.
+	# MAY DELETE THIS
 	start_day = models.PositiveSmallIntegerField(
 		
 		default=0,
@@ -88,7 +98,7 @@ class Profile(models.Model):
 		max_digits=5,
 		decimal_places=2,
 		default=0.0)
-
+	
 
 class Day:
 	"""Contains information relating to a specific schedule day"""	
