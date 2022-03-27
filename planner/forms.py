@@ -128,15 +128,15 @@ class PR_Goal_Form(forms.Form):
 		)
 	goal_distance = forms.DecimalField(
 		max_value = 100.00,
-		min_value = 0,
+		min_value = 0.1,
 		label = 'Goal distance (km)',
 		required = False,
 		)
 	# Used for both minutes and distance depending on which one is selected / 
 	# depending on which progression type is selected 
-	increment_value = forms.IntegerField(
+	increment_value = forms.DecimalField(
 		max_value = 100,
-		min_value = 1,
+		min_value = 0.1,
 		label='Progression value TODO',
 		required=True,)
 

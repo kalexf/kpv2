@@ -139,13 +139,7 @@ class Activity(models.Model):
 	last_done = models.DateField(null=True)
 	# Whether act increases difficulty / length over time
 	progressive = models.BooleanField(default=False)
-	# How often (maximum) the activity should be done - value represents how many
-	# days must pass before activity repeated in schedule - default is 7 and represents
-	# the activity being done once per week
-	frequency = models.PositiveSmallIntegerField(
-		default=7,
-		validators=[MaxValueValidator(365),MinValueValidator(1)]
-		)
+	
 	# Used to store activity type in DB
 	my_type = models.CharField(max_length=20,default='')
 	def __str__(self):
@@ -196,6 +190,20 @@ class PacedRun(Activity):
 		) 			
 	# Goal distance for activity - increases towards this value if progressive.
 	goal_distance = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
+
+	def progress(self):
+		"""Increas the activity's base value by its progression value"""
+		if self.prog_value == 'TIME':
+			self.minutes += self.prog_minutes
+			if self.minutes and self.minutes >= self.goal_minutes:
+				self.progressive = False
+
+		elif self.prog_value == 'DIST':
+			self.distance += self.prog_distance
+			if self.distance and self.distance >= self.goal_distance:
+				self.progressive = False
+		return self		
+
 
 	def setgoals(self,post):
 		"""Sets Goal/progression values from form data"""
@@ -271,6 +279,11 @@ class Intervals(Activity):
 	rep_goal = models.PositiveSmallIntegerField(null=True,blank=True)
 	# Number of reps to be added each time
 	increment = models.PositiveSmallIntegerField(default=1)
+	def progress(self):
+		self.rep_number += self.increment
+		if self.rep_number >= self.rep_goal:
+			self.progressive = False
+		return self	
 
 	def setgoals(self,post):
 		"""Sets Goal/progression values from form data"""
@@ -310,6 +323,12 @@ class TimeTrial(Activity):
 	# Number of seconds to be taken off time each time exercise done
 	prog_time = models.PositiveSmallIntegerField(blank=True,null=True)
 
+	def progress(self):
+		self.time -= self.prog_time
+		if self.time <= self.goal_time:
+			self.progressive = False
+		return self	
+	
 	def setgoals(self,post):
 		"""Sets Goal/progression values from form data"""
 		goal_minutes = post.get('goal_minutes')

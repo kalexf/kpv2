@@ -203,9 +203,15 @@ def submit(request, act_id=None):
 	elif request.method == 'POST':
 		act_id = request.POST.get('act_id')
 		activity = get_act(act_id)
-		activity.difficulty = request.POST.get('difficulty')
-		activity.last_done = date.today()
-		activity.save()
+		model = get_model(activity.my_type)
+		this_act = model.objects.get(id=act_id)
+		this_act.difficulty = request.POST.get('difficulty')
+		this_act.last_done = date.today()
+		if this_act.progressive:
+			this_act.progress()
+		this_act.setvalues()
+		this_act.save()
+
 
 	return redirect('planner:home')	
 
