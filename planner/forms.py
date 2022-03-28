@@ -7,16 +7,6 @@ from .models import DIFF_CHOICES, DOW_CHOICES, WEEKS_CHOICES
 
 
 
-class WeeksForm(forms.Form):
-	"""for setting number of weeks in schedule"""
-	weeks = forms.ChoiceField(
-		choices=[
-		(1,'1 Week'),
-		(2,'2 Weeks'),
-		(4,'4 Weeks'),
-		],
-		required=True
-		)
 
 class ScheduleForm(forms.Form):
 	"""
@@ -44,12 +34,14 @@ class Profile_Form(forms.ModelForm):
 		fields = [
 		'start_day',
 		'mileage_target',
-		'mileage_increment'
+		'mileage_increment',
+		'schedule_length',
 		]
 		labels = {
 		'start_day':'Initial Day of week for new schedules',
 		'mileage_target':'Weekly distance target (km)',
-		'mileage_increment':'Weekly distance increase (km).'
+		'mileage_increment':'Weekly distance increase (km).',
+		'schedule_length':'How many weeks should one schedule cycle be?'
 		
 		}
 		

@@ -6,7 +6,7 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile, Day )
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
 	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
-	Profile_Form, WeeksForm, ScheduleForm )
+	Profile_Form, ScheduleForm )
 
 
 
@@ -109,6 +109,8 @@ def next_day_instance(day_integer):
 	# Will only fail if something other than int 0-6 passed as arg
 	except:
 		return 0			
+
+
 
 
 def generate_schedule(request):

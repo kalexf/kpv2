@@ -78,7 +78,10 @@ class Profile(models.Model):
 	schedule = models.JSONField(null=True)
 	last_exercise = models.DateField(null=True)
 	# How many weeks the schedule will run for
-	schedule_length = models.PositiveSmallIntegerField(default=1)
+	schedule_length = models.PositiveSmallIntegerField(
+		default=1,
+		choices=WEEKS_CHOICES,
+		)
 	# Day of week used as initial day for new schedule.
 	# MAY DELETE THIS
 	start_day = models.PositiveSmallIntegerField(
