@@ -10,14 +10,14 @@
               <tr>
                 {% for day in schedule_list|slice:":6" %}
                 <td>
-                    {{day.date|date:"D d M"}}
+                    {{day.date_str}}
                 </td>
                 {% endfor %}
               </tr>
               <tr>
                 {% for day in schedule_list|slice:":6" %}
                 <td>
-                    {% if day.rest %} Rest Day {% endif %}
+                    {{day.name}}
                 </td>
                 {% endfor %}
               </tr>
@@ -25,14 +25,14 @@
               <tr>
                 {% for day in schedule_list|slice:"7:13" %}
                 <td>
-                    {{day.date|date:"D d M"}}
+                    {{day.date_str}}
                 </td>
                 {% endfor %}
               </tr>
               <tr>
                 {% for day in schedule_list|slice:"7:13" %}
                 <td>
-                  {% if day.rest %} Rest Day {% endif %}
+                  {{day.name}}
                 </td>
                 {% endfor %}
             </table>  
@@ -72,5 +72,21 @@
        
        {% else %} <p>Please log in /register </p>
        {% endif %} 
+    <p>TESTS</p>
+    <p>day_1</p>
+      {% if day_1 %}
+        {{day_1}}
+      {% endif %}
+
+    <p>dump_schedule</p>
+    {% if dump_schedule %}
+    {{dump_schedule}}
+    {% endif %}  
+
+
+
+
+
+    </p>   
 
     {% endblock content %}

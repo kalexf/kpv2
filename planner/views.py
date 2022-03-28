@@ -3,7 +3,7 @@ from datetime import date, timedelta, datetime
 import json
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
-	Profile, Day )
+	Profile,)
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
 	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
 	Profile_Form, ScheduleForm )
@@ -67,11 +67,40 @@ def home(request):
 	
 	
 		context['activities'] = activities
+		schedule_list = get_schedule_list()
+		context['schedule_list'] = schedule_list
 		
-		
+
+
+		# For tests
+		dump_schedule = json.loads(profile.schedule)
+		day_1 = dump_schedule['day_1']
+		context['dump_schedule'] = dump_schedule
+		context['day_1'] = day_1
 
 	
 	return render(request,'planner/home.html', context)
+
+class Day:
+	"""
+	For constructing schedule object used for schedule object on hom screen
+	"""
+	def __init__(self,date,name='Rest Day'):
+		self.date_str = date.strftime("%a %d %b")
+		self.name = name
+
+def get_schedule_list():
+	"""
+	Generate list of 14 'Day' objects used to display next two weeks on home
+	"""
+	#Test
+	sch_list = []
+	for i in range(14):
+		day = Day(date.today(),'Test')
+		sch_list.append(day)
+	return sch_list	
+
+
 
 def settings(request):
 	"""
