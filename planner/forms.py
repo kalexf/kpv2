@@ -100,23 +100,39 @@ class CT_Form(forms.ModelForm):
 		model = CrossTrain
 		fields = [
 			'exercise_type'
-		]	
+			]	
 		labels = {
 		'exercise_type':'Activity Name'
-		}		
+			}		
 
 class SubmissionForm(forms.Form):
-	"""Form for entering details of completed activities"""
-
+	"""
+	Form for entering details of completed non-progressive activities
+	"""
 	difficulty = forms.ChoiceField(
 		choices=DIFF_CHOICES,
 		required=True,
-		label='How difficult did the activity feel') 
-	# Choices / radio fields for recording difficulty and
-	# whether activity fully done
+		label='How difficult did the activity feel')
+	completed = forms.BooleanField(
+		label='Activity Targets Met?',
+		initial=True,
+		required=False)	 
+	
 
-
-
+# Expanded forms for any activities that need them	
+class TT_SubForm(SubmissionForm):
+	minutes = forms.IntegerField(
+		label='Minutes',
+		max_value = 720,
+		min_value = 0,
+		required = False
+		)
+	seconds = forms.IntegerField(
+		label='Seconds',
+		max_value = 59,
+		min_value = 0,
+		required = False
+		)
 # Goal forms - for setting progression / goal values of activities
 
 class PR_Goal_Form(forms.Form):

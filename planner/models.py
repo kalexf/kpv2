@@ -1,7 +1,9 @@
+from django import forms
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from decimal import Decimal
+from datetime import date
 
 # Create your models here.
 
@@ -139,12 +141,17 @@ class Activity(models.Model):
 	last_done = models.DateField(null=True)
 	# Whether act increases difficulty / length over time
 	progressive = models.BooleanField(default=False)
-	
 	# Used to store activity type in DB
 	my_type = models.CharField(max_length=20,default='')
 	def __str__(self):
 		"""return string representation of the object"""
 		return self.name
+	def update(self,post):
+		"""update values from submitted completion form data"""
+		self.difficulty = post.get('difficulty')
+		self.last_done = date.today()	
+		return self
+
 
 
 
@@ -191,14 +198,19 @@ class PacedRun(Activity):
 	# Goal distance for activity - increases towards this value if progressive.
 	goal_distance = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
 
+	
+
+
+
 	def progress(self):
 		"""Increas the activity's base value by its progression value"""
-		if self.prog_value == 'TIME':
+		# Progressing time
+		if self.prog_value == self.PROG_CHOICES[1][1]:
 			self.minutes += self.prog_minutes
 			if self.minutes and self.minutes >= self.goal_minutes:
 				self.progressive = False
-
-		elif self.prog_value == 'DIST':
+		# Progressing Distance		
+		elif self.prog_value == self.PROG_CHOICES[2][1]:
 			self.distance += self.prog_distance
 			if self.distance and self.distance >= self.goal_distance:
 				self.progressive = False
@@ -316,17 +328,29 @@ class TimeTrial(Activity):
 	# User readable act_type and description
 	act_type = ACTIVITY_DESCRIPTIONS[2]['act_type']
 	description = ACTIVITY_DESCRIPTIONS[2]['description']
-	# Time (in seconds) of activity 
+	# time represents the most recent performed time for the activity.
 	time = models.PositiveSmallIntegerField(blank=True,null=True)
-	# Goal target time
+	# Goal time represents the eventual goal time attempting to beat.
 	goal_time = models.PositiveSmallIntegerField(blank=True,null=True)
-	# Number of seconds to be taken off time each time exercise done
+	# Number of seconds to be taken off time each time exercise done.
 	prog_time = models.PositiveSmallIntegerField(blank=True,null=True)
-
+	
+	def update(self,post):
+		super().update(post)
+		# If minutes and/or seconds values given on form, calculate new time value.
+		
+		minutes = post.get('minutes')
+		seconds = post.get('seconds')
+		if minutes:
+			self.time = int(minutes) * 60
+		if seconds:
+			self.time += int(seconds)	
+	
 	def progress(self):
-		self.time -= self.prog_time
-		if self.time <= self.goal_time:
-			self.progressive = False
+		if self.time:
+			self.time -= self.prog_time
+			if self.time <= self.goal_time:
+				self.progressive = False
 		return self	
 	
 	def setgoals(self,post):
@@ -349,6 +373,7 @@ class TimeTrial(Activity):
 		"""Sets the name field for the activity"""
 		self.my_type = self.act_type
 		self.name = f'{self.distance}km Time Trial'
+		self.has_extra_form = True
 		return(self)	
 
 	def goal_prepop(self):

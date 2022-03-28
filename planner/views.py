@@ -5,7 +5,7 @@ import json
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
 	Profile, Day )
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
-	Int_Goal_Form, TT_Goal_Form, SubmissionForm, 
+	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
 	Profile_Form, TestForm, ScheduleForm )
 
 
@@ -38,7 +38,13 @@ GOAL_FORMS = {
 	ACT_TYPES[2].act_type:TT_Goal_Form,
 	
 	}
-
+# Forms for completion, most take standard form.	
+SUB_FORMS = {
+	ACT_TYPES[0].act_type:SubmissionForm,
+	ACT_TYPES[1].act_type:SubmissionForm,
+	ACT_TYPES[2].act_type:TT_SubForm,
+	ACT_TYPES[3].act_type:SubmissionForm,
+	}
 
 
 
@@ -191,24 +197,28 @@ def testview(request):
 
 	return render(request,'planner/testtemplate.html',context)
 
-def submit(request, act_id=None):
+def submit(request, act_id):
 	"""Serve page where user can submit details of completed activity"""
 	# Get activity
+	
 	if request.method != 'POST':
-		activity = get_act(act_id)
-		form = SubmissionForm
+		
+		activity = get_act(act_id)	
+		form = SUB_FORMS[activity.my_type]
 		context = {'activity':activity,'form':form}
 		return render(request, 'planner/submit.html',context)
 
+
 	elif request.method == 'POST':
-		act_id = request.POST.get('act_id')
-		activity = get_act(act_id)
+		# Gets iD from hidden form field 
+		activity = get_act(request.POST.get('act_id'))
 		model = get_model(activity.my_type)
 		this_act = model.objects.get(id=act_id)
-		this_act.difficulty = request.POST.get('difficulty')
-		this_act.last_done = date.today()
-		if this_act.progressive:
-			this_act.progress()
+		# Update Activity values from Post data
+		this_act.update(request.POST)
+		
+		if this_act.progressive and request.POST.get('completed'):
+				this_act.progress()
 		this_act.setvalues()
 		this_act.save()
 
