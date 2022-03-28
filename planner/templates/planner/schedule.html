@@ -4,7 +4,7 @@
 
 <p># TODO option  to set number of weeks in schedule</p>
 
-  <form method="post" action="{% url 'planner:generate' 'save' %}">
+  <form method="post" action="{% url 'planner:generate' %}">
     {% csrf_token %} 
     <table>
       {% if Week_1 %}
@@ -95,7 +95,7 @@
   </form>      
 
 <p>Tests</p>
-{{data}}
+
 
 
 

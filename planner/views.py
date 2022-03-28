@@ -6,7 +6,7 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile, Day )
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
 	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
-	Profile_Form, TestForm, ScheduleForm )
+	Profile_Form, WeeksForm, ScheduleForm )
 
 
 
@@ -111,7 +111,7 @@ def next_day_instance(day_integer):
 		return 0			
 
 
-def generate_schedule(request,route=''):
+def generate_schedule(request):
 	"""
 	Returns Screen where user can build new schedule, saves cubmitted schedule
 	to user profile.
@@ -124,6 +124,7 @@ def generate_schedule(request,route=''):
 	except:
 		initial_dict = {}
 	form = ScheduleForm(weeks,choices,initial_dict)
+
 	
 	if request.method == 'POST':
 		#check and save form
@@ -143,22 +144,11 @@ def generate_schedule(request,route=''):
 		'form':form,
 
 		}
+	# get_lists will return dictionary containing n =weeks lists of day names,
+	# this is used to determine how many table rows will be created in template	
 	day_list = get_lists(weeks)
 	context.update(day_list)
 	
-	if request.method == 'POST':
-		context['data'] = request.POST
-
-	if route == 'edit':
-	# Request to edit schedule, render editing view
-		pass
-
-	
-	# submitted form, save values and redirect 	
-	if route == 'save':
-		pass
-
-
 	return render(request,'planner/schedule.html',context)
 
 def get_schedule_choices(user):
@@ -176,7 +166,10 @@ def get_schedule_choices(user):
 
 
 def get_lists(weeks):
-	"""Returns dictionary mapping Week_n to list of days """
+	"""
+	Returns dict containing n=weeks lists of weekdays values, 'week_n' keys 
+	"""
+
 	days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun',]
 	day_dict = {}
 	for i in range(weeks):

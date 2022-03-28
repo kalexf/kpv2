@@ -5,13 +5,18 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 from .models import DIFF_CHOICES, DOW_CHOICES, WEEKS_CHOICES
 
 
-class TestForm(forms.Form):	
 
-	def __init__(self, weeks, choices):
-		super(TestForm,self).__init__()
-		for i in range(weeks * 7):
-			self.fields[f'day_{i}'] = forms.ChoiceField(choices=choices)
 
+class WeeksForm(forms.Form):
+	"""for setting number of weeks in schedule"""
+	weeks = forms.ChoiceField(
+		choices=[
+		(1,'1 Week'),
+		(2,'2 Weeks'),
+		(4,'4 Weeks'),
+		],
+		required=True
+		)
 
 class ScheduleForm(forms.Form):
 	"""
