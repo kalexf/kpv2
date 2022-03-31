@@ -64,10 +64,10 @@ def home(request):
 		
 		# Get user's activities for home screen list
 		activities = Activity.objects.filter(owner=request.user)
-	
-	
 		context['activities'] = activities
-		schedule_list = get_schedule_list()
+		
+		# schedule_list should be list of Day objects.
+		schedule_list = get_schedule_list(profile)
 		context['schedule_list'] = schedule_list
 		
 
@@ -87,20 +87,38 @@ class Day:
 	"""
 	def __init__(self,date,name='Rest Day'):
 		self.date_str = date.strftime("%a %d %b")
+		if date == date.today():
+			self.date_str = 'Today'
 		self.name = name
 
-def get_schedule_list():
+def get_schedule_list(profile):
 	"""
 	Generate list of 14 'Day' objects used to display next two weeks on home
 	"""
-	#Test
+	
+	# Get initial Monday.
+	start_date = get_initial_date(date.today()) 
+	# Empty list
 	sch_list = []
-	for i in range(14):
-		day = Day(date.today(),'Test')
+	# 
+	for i in range(profile.schedule_length * 7):
+		day = Day(start_date+timedelta(days=i),'Test')
 		sch_list.append(day)
+	
+
+
+
 	return sch_list	
 
 
+def get_initial_date(t_day):
+	"""Returns date object for most recent Monday(inc today)"""
+	
+	for i in range(7):
+		if t_day.strftime("%a") == 'Mon':
+			return t_day
+		t_day -= timedelta(days=1)	
+	return 0
 
 def settings(request):
 	"""
@@ -121,25 +139,7 @@ def settings(request):
 		form = Profile_Form(instance=profile,data=request.POST)
 		form.save()
 		return redirect('planner:home')
-
-def next_day_instance(day_integer):
-	"""
-	Given an integer 0-6 representing day of week, returns the next calendar
-	isntance of that day (including today).
-	"""
-	# Run though next 7 days until correct day found
-	try:
-		for i in range(0,7):
-
-			day = date.today() + timedelta(days=i)
-			if day.weekday() == day_integer:
-				# Return python date object for correct day
-				return day
-	# Will only fail if something other than int 0-6 passed as arg
-	except:
-		return 0			
-
-
+		
 
 
 def generate_schedule(request):

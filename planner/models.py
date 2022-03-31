@@ -79,7 +79,7 @@ class Profile(models.Model):
 	last_exercise = models.DateField(null=True)
 	# How many weeks the schedule will run for
 	schedule_length = models.PositiveSmallIntegerField(
-		default=1,
+		default=2,
 		choices=WEEKS_CHOICES,
 		)
 	# Day of week used as initial day for new schedule.
@@ -104,13 +104,6 @@ class Profile(models.Model):
 		decimal_places=2,
 		default=0.0)
 	
-
-class Day:
-	"""Contains information relating to a specific schedule day"""	
-	def __init__(self, date):
-		# Calendar date the day relates to.
-		self.date = date
-
 
 
 
