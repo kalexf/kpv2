@@ -105,26 +105,36 @@ def get_schedule_list(profile):
 	# Create sch_list object, length 14, with correct dates and preset to 'rest' 
 	sch_list = []
 	for i in range(14):
-		day = Day(start_date+timedelta(days=i),'Test')
+		day = Day(start_date+timedelta(days=i),'Rest Day')
 		sch_list.append(day)
 	
 
-	if weeks == 1:
-		for i in range(1,7):
-			day_val = schedule[f'day_{i}']
-			if day_val != 'REST':
-				# Test, chagne to lookup TODO
-				sch_list[i].name = day_val
-		for i in range(1,7):
-			day_val = schedule[f'day_{i}']
-			if day_val != 'REST':
-				# Test, chagne to lookup TODO
-				sch_list[i+7].name = day_val	  
+	try:
+		# REfactor these to single funciton if possible
+		if weeks == 1:
+			for i in range(1,7):
+				day_val = schedule[f'day_{i}']
+				if day_val != 'REST':
+					# Test, chagne to lookup TODO
+					act = get_act(day_val)
+					sch_list[i].name = act.name
+			for i in range(1,7):
+				day_val = schedule[f'day_{i}']
+				if day_val != 'REST':
+					# Test, chagne to lookup TODO
+					act = get_act(day_val)
+					sch_list[i+7].name = act.name	  
 
-	if weeks == 2:
-		pass
-	if weeks == 4:
-		pass		
+		if weeks == 2:
+			for i in range(1,14):
+				day_val = schedule[f'day_{i}']
+				if day_val != 'REST':
+					act = get_act(day_val)
+					sch_list[i].name = act.name
+		if weeks == 4:
+			pass
+	except:
+		return 0				
 
 
 
