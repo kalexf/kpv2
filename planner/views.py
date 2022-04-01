@@ -99,12 +99,33 @@ def get_schedule_list(profile):
 	# Get initial Monday.
 	start_date = get_initial_date(date.today()) 
 	# Empty list
+	weeks = profile.schedule_length
+	# Get JSON dictionary for act_id lookups
+	schedule = json.loads(profile.schedule)
+	# Create sch_list object, length 14, with correct dates and preset to 'rest' 
 	sch_list = []
-	# 
-	for i in range(profile.schedule_length * 7):
+	for i in range(14):
 		day = Day(start_date+timedelta(days=i),'Test')
 		sch_list.append(day)
 	
+
+	if weeks == 1:
+		for i in range(1,7):
+			day_val = schedule[f'day_{i}']
+			if day_val != 'REST':
+				# Test, chagne to lookup TODO
+				sch_list[i].name = day_val
+		for i in range(1,7):
+			day_val = schedule[f'day_{i}']
+			if day_val != 'REST':
+				# Test, chagne to lookup TODO
+				sch_list[i+7].name = day_val	  
+
+	if weeks == 2:
+		pass
+	if weeks == 4:
+		pass		
+
 
 
 
