@@ -70,6 +70,9 @@ WEEKS_CHOICES = [
 class Profile(models.Model):
 	"""Stores information about user used to generate schedule and track
 	statistics. Any information not related to a specific activity saved here"""
+	# Used to track date which corresponds to first day of shchedule where
+	# sch_length > 1. 
+	schedule_init_date = models.DateField(null=True)
 	owner = models.ForeignKey(
 		User, 
 		on_delete=models.CASCADE

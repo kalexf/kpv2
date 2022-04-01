@@ -108,9 +108,24 @@ def get_schedule_list(profile):
 		day = Day(start_date+timedelta(days=i),'Rest Day')
 		sch_list.append(day)
 	
+	# Calculate the difference between im(d.t) and schedule start
+	if not profile.schedule_init_date:
+		profile.schedule_init_date = get_initial_date(date.today())
+		profile.save()
+
+	
+	initial_date = profile.schedule_init_date
+	sch_list_init = get_initial_date(date.today())
+
+	delta = profile.schedule_init_date - get_initial_date(date.today())
+	offset = 0
+	if delta.days >= 7 and delta.days <= 28:
+		offset = delta.days / 7
+		
 
 	try:
 		# REfactor these to single funciton if possible
+		
 		if weeks == 1:
 			for i in range(1,7):
 				day_val = schedule[f'day_{i}']
@@ -126,12 +141,31 @@ def get_schedule_list(profile):
 					sch_list[i+7].name = act.name	  
 
 		if weeks == 2:
+			# TODO refactor assign to discreet function
+			# If inverting, assign day_n+7 to sch[n]
+			if offset >= 1:
+				# First half of sch_list, using values from 2nd half of schedule
+				for i in range(7):
+					day_val = schedule[f'day_{i+7}']
+					if day_val != 'REST':
+						act = get_act(day_val)
+						sch_list[i].name = act.name
+				# Second half of sch_list, using values from 1st half of schedule
+				for i in range()		
+
+
 			for i in range(1,14):
 				day_val = schedule[f'day_{i}']
 				if day_val != 'REST':
 					act = get_act(day_val)
 					sch_list[i].name = act.name
+					
+			
+
 		if weeks == 4:
+			# get 
+			# Essentially, find relevant slice of JSON schedule, use that as
+			# per weeks == 2
 			pass
 	except:
 		return 0				
@@ -143,7 +177,10 @@ def get_schedule_list(profile):
 
 
 def get_initial_date(t_day):
-	"""Returns date object for most recent Monday(inc today)"""
+	"""
+	Returns date object for most recent Monday(inc today).
+	Currently returns initial monday only, not profile.Start_date
+	"""
 	
 	for i in range(7):
 		if t_day.strftime("%a") == 'Mon':
