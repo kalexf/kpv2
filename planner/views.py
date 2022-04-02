@@ -117,62 +117,70 @@ def get_schedule_list(profile):
 	initial_date = profile.schedule_init_date
 	sch_list_init = get_initial_date(date.today())
 
-	delta = profile.schedule_init_date - get_initial_date(date.today())
-	offset = 0
-	if delta.days >= 7 and delta.days <= 28:
-		offset = delta.days / 7
-		
+	# Work out which week of schedule we are on
+	if weeks != 1:
+		schedule_week = 0 
+		date_diff = profile.schedule_init_date - get_initial_date(date.today())
+		if date_diff.days >= 7 and date_diff.days <= 28:
+			schedule_week = delta.days / 7
 
-	try:
-		# REfactor these to single funciton if possible
-		
-		if weeks == 1:
-			for i in range(1,7):
-				day_val = schedule[f'day_{i}']
-				if day_val != 'REST':
-					# Test, chagne to lookup TODO
-					act = get_act(day_val)
-					sch_list[i].name = act.name
-			for i in range(1,7):
-				day_val = schedule[f'day_{i}']
-				if day_val != 'REST':
-					# Test, chagne to lookup TODO
-					act = get_act(day_val)
-					sch_list[i+7].name = act.name	  
-
-		if weeks == 2:
-			# TODO refactor assign to discreet function
-			# If inverting, assign day_n+7 to sch[n]
-			if offset >= 1:
-				# First half of sch_list, using values from 2nd half of schedule
-				for i in range(7):
-					day_val = schedule[f'day_{i+7}']
-					if day_val != 'REST':
-						act = get_act(day_val)
-						sch_list[i].name = act.name
-				# Second half of sch_list, using values from 1st half of schedule
-				for i in range()		
-
-
-			for i in range(1,14):
-				day_val = schedule[f'day_{i}']
-				if day_val != 'REST':
-					act = get_act(day_val)
-					sch_list[i].name = act.name
-					
+		# check on if clause if schedule_week > 4:
+				
 			
 
-		if weeks == 4:
-			# get 
-			# Essentially, find relevant slice of JSON schedule, use that as
-			# per weeks == 2
-			pass
-	except:
-		return 0				
+	# One week schedule
+	if weeks == 1:
+		# Copy values from schedule to schedule_list
+		for i in range(1,7):
+			day_val = schedule[f'day_{i}']
+			if day_val != 'REST':
+				
+				act = get_act(day_val)
+				sch_list[i].name = act.name
+				sch_list[i+7].name = act.name
 
 
 
 
+	# Two week schedule  
+	if weeks == 2:
+		# 3rd week or later: reset to first week.
+		if schedule_week > 1:
+			schedule_week = 0
+			profile.schedule_init_date = get_initial_date(date.today())
+		# Second week, invert schedule weeks
+		if schedule_week == 1:
+			#Second week: invert schedule weeks
+			a = schedule[:6]
+			b = schedule[7:13]
+
+			schedule = b + a
+
+		# Copy values into schedule_list
+
+		for i in range(1,14):
+			day_val = schedule[f'day_{i}']
+			if day_val != 'REST':
+				act = get_act(day_val)
+				sch_list[i].name = act.name
+
+	# Four week schedule - get relevant two slices of schedule
+	if weeks == 4:
+		if schedule_week > 3:
+			schedule_week = 0
+			profile.schedule_init_date = get_initial_date(date.today())
+			profile.save()
+		if schedule_week == 0:
+			a = schedule[:13]
+		if schedule_week == 1:
+			a = schedule[6:20]
+		if schedule_week == 2:
+			a = schedule[13:27]
+		if schedule_week == 3:
+			a = schedule[20:27] + schedule[0:6]	
+		schedule = a
+
+								
 	return sch_list	
 
 
