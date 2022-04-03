@@ -2,98 +2,100 @@
 
 {% block content %}
 
-<p># TODO option  to set number of weeks in schedule</p>
-
-  <form method="post" action="{% url 'planner:generate' %}">
-    {% csrf_token %} 
-    <table>
-      {% if Week_1 %}
-      <tr>
-      {% for day in Week_1 %}
-       <td>{{day}}</td>
-      {% endfor %}
-    </tr>
-    <tr>
-        <td>{{form.day_1}}</td>
-        <td>{{form.day_2}}</td>
-        <td>{{form.day_3}}</td>
-        <td>{{form.day_4}}</td>
-        <td>{{form.day_5}}</td>
-        <td>{{form.day_6}}</td>
-        <td>{{form.day_7}}</td>
+  {% if message %}
+    {{message}}
+  {% endif %}  
+  {% if not message %}
+    <form method="post" action="{% url 'planner:generate' %}">
+      {% csrf_token %} 
+      <table>
+        {% if Week_1 %}
+        <tr>
+        {% for day in Week_1 %}
+         <td>{{day}}</td>
+        {% endfor %}
       </tr>
-
-      
-      {% endif %}
-
-      {% if Week_2 %}  
       <tr>
-      {% for day in Week_2 %}
-       <td>{{day}}</td>
-      {% endfor %}
-      </tr>
-    <tr>
-        <td>{{form.day_8}}</td>
-        <td>{{form.day_9}}</td>
-        <td>{{form.day_10}}</td>
-        <td>{{form.day_11}}</td>
-        <td>{{form.day_12}}</td>
-        <td>{{form.day_13}}</td>
-        <td>{{form.day_14}}</td>
-      </tr>  
+          <td>{{form.day_1}}</td>
+          <td>{{form.day_2}}</td>
+          <td>{{form.day_3}}</td>
+          <td>{{form.day_4}}</td>
+          <td>{{form.day_5}}</td>
+          <td>{{form.day_6}}</td>
+          <td>{{form.day_7}}</td>
+        </tr>
 
-      
-      {% endif %}
-
-      {% if Week_3 %}
-      <tr>
-      {% for day in Week_3 %}
-       <td>{{day}}</td>
-      {% endfor %}
-    </tr>
-    <tr>
-        <td>{{form.day_15}}</td>
-        <td>{{form.day_16}}</td>
-        <td>{{form.day_17}}</td>
-        <td>{{form.day_18}}</td>
-        <td>{{form.day_19}}</td>
-        <td>{{form.day_20}}</td>
-        <td>{{form.day_21}}</td>
-      </tr>
-
-      
-      {% endif %}
-
-      {% if Week_4 %}  
-      <tr>
-      {% for day in Week_4 %}
-       <td>{{day}}</td>
-      {% endfor %}
-      </tr>
-    <tr>
-        <td>{{form.day_22}}</td>
-        <td>{{form.day_23}}</td>
-        <td>{{form.day_24}}</td>
-        <td>{{form.day_25}}</td>
-        <td>{{form.day_26}}</td>
-        <td>{{form.day_27}}</td>
-        <td>{{form.day_28}}</td>
-      </tr>  
-
-     
-      {% endif %}
-
-      
         
+        {% endif %}
+
+        {% if Week_2 %}  
+        <tr>
+        {% for day in Week_2 %}
+         <td>{{day}}</td>
+        {% endfor %}
+        </tr>
+      <tr>
+          <td>{{form.day_8}}</td>
+          <td>{{form.day_9}}</td>
+          <td>{{form.day_10}}</td>
+          <td>{{form.day_11}}</td>
+          <td>{{form.day_12}}</td>
+          <td>{{form.day_13}}</td>
+          <td>{{form.day_14}}</td>
+        </tr>  
+
+        
+        {% endif %}
+
+        {% if Week_3 %}
+        <tr>
+        {% for day in Week_3 %}
+         <td>{{day}}</td>
+        {% endfor %}
+      </tr>
+      <tr>
+          <td>{{form.day_15}}</td>
+          <td>{{form.day_16}}</td>
+          <td>{{form.day_17}}</td>
+          <td>{{form.day_18}}</td>
+          <td>{{form.day_19}}</td>
+          <td>{{form.day_20}}</td>
+          <td>{{form.day_21}}</td>
+        </tr>
+
+        
+        {% endif %}
+
+        {% if Week_4 %}  
+        <tr>
+        {% for day in Week_4 %}
+         <td>{{day}}</td>
+        {% endfor %}
+        </tr>
+      <tr>
+          <td>{{form.day_22}}</td>
+          <td>{{form.day_23}}</td>
+          <td>{{form.day_24}}</td>
+          <td>{{form.day_25}}</td>
+          <td>{{form.day_26}}</td>
+          <td>{{form.day_27}}</td>
+          <td>{{form.day_28}}</td>
+        </tr>  
+
+       
+        {% endif %}
+
+        
+          
+        
+      </table> 
       
-    </table> 
+      <button name="submit">Save Changes</button>
+
     
-    <button name="submit">Save Changes</button>
 
-  
-
-  </form>      
-
+    </form>      
+{% endif %}
 <p>Tests</p>
 
 

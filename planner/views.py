@@ -67,16 +67,21 @@ def home(request):
 		context['activities'] = activities
 		
 		# schedule_list should be list of Day objects.
-		schedule_list = get_schedule_list(profile)
-		context['schedule_list'] = schedule_list
+		if profile.schedule:
 		
+			schedule_list = get_schedule_list(profile)
+			context['schedule_list'] = schedule_list
+		else:
+			#no schedule, message to create one
+			message = 'Use links below to create activities/ schedule'
+			context['no_sch_message'] = message
 
-
-		# For tests
-		dump_schedule = json.loads(profile.schedule)
-		day_1 = dump_schedule['day_1']
-		context['dump_schedule'] = dump_schedule
-		context['day_1'] = day_1
+		# FOR TESTS ONLY
+		if profile.schedule:
+			dump_schedule = json.loads(profile.schedule)
+			day_1 = dump_schedule['day_1']
+			context['dump_schedule'] = dump_schedule
+			context['day_1'] = day_1
 
 	
 	return render(request,'planner/home.html', context)
@@ -102,6 +107,8 @@ def get_schedule_list(profile):
 	weeks = profile.schedule_length
 	# Get JSON dictionary for act_id lookups
 	schedule = json.loads(profile.schedule)
+	
+
 	# Create sch_list object, length 14, with correct dates and preset to 'rest' 
 	sch_list = []
 	for i in range(14):
@@ -223,13 +230,18 @@ def generate_schedule(request):
 	Returns Screen where user can build new schedule, saves cubmitted schedule
 	to user profile.
 	"""
+	context ={}
 	profile = get_profile(request.user)
 	weeks = profile.schedule_length
 	choices = get_schedule_choices(request.user)
+	if len(choices) == 1:
+		message = "You need to create some activities before making a schedule"
+		context['message'] = message
 	try:
 		initial_dict = json.loads(profile.schedule)
 	except:
 		initial_dict = {}
+	# Generate form with correct number of fields.	
 	form = ScheduleForm(weeks,choices,initial_dict)
 
 	
@@ -247,10 +259,7 @@ def generate_schedule(request):
 	
 	
 	# CHANGE TO profile.schedule_length
-	context = {
-		'form':form,
-
-		}
+	context['form'] = form
 	# get_lists will return dictionary containing n =weeks lists of day names,
 	# this is used to determine how many table rows will be created in template	
 	day_list = get_lists(weeks)
@@ -288,14 +297,10 @@ def get_lists(weeks):
 
 def testview(request):
 	"""for testing"""
-	TESTCHOICES = [('1','one'),('2','two'),('3','drei'),]
-	weeks = 2
-	form = TestForm(1,TESTCHOICES)
-
-	context = {'form':form}
+	
 
 
-	return render(request,'planner/testtemplate.html',context)
+	return render(request,'planner/testtemplate.html')
 
 def submit(request, act_id):
 	"""Serve page where user can submit details of completed activity"""

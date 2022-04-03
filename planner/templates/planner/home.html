@@ -37,7 +37,11 @@
                 {% endfor %}
             </table>  
                 
-        {% endif %}   
+        
+        {% endif %}  
+        {% if no_sch_message %}
+          <p>{{no_sch_message}}</p> 
+        {% endif %}    
         <!-- links for creating / editing profile and schedule-->
         <p>
           <a href="{% url 'planner:generate' %}">Create / Edit Schedule</a>
