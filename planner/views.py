@@ -103,7 +103,8 @@ def get_schedule_list(profile):
 	schedule = json.loads(profile.schedule)
 	
 
-	# Create sch_list object, length 14, with correct dates and preset to 'rest' 
+	# Create blank sch_list object, length 14, 
+	# with correct dates and value preset to 'rest'. 
 	sch_list = []
 	for i in range(14):
 		day = Day(start_date+timedelta(days=i),'Rest Day')
@@ -115,8 +116,6 @@ def get_schedule_list(profile):
 		profile.save()
 
 	
-	initial_date = profile.schedule_init_date
-	sch_list_init = get_initial_date(date.today())
 
 	# Work out which week of schedule we are on
 	if weeks != 1:
@@ -137,8 +136,8 @@ def get_schedule_list(profile):
 			if day_val != 'REST':
 				
 				act = get_act(day_val)
-				sch_list[i].name = act.name
-				sch_list[i+7].name = act.name
+				sch_list[i-1].name = act.name
+				sch_list[i+6].name = act.name
 
 
 
