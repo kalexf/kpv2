@@ -76,12 +76,6 @@ def home(request):
 			message = 'Use links below to create activities/ schedule'
 			context['no_sch_message'] = message
 
-		# FOR TESTS ONLY
-		if profile.schedule:
-			dump_schedule = json.loads(profile.schedule)
-			day_1 = dump_schedule['day_1']
-			context['dump_schedule'] = dump_schedule
-			context['day_1'] = day_1
 
 	
 	return render(request,'planner/home.html', context)
@@ -218,9 +212,17 @@ def settings(request):
 		return render(request,'planner/profilesettings.html',context)
 
 	else:
-		##
+		# POST request, submitted form
+		# Save new values	
 		form = Profile_Form(instance=profile,data=request.POST)
 		form.save()
+		# Check if user has changed schedule length setting, if it has been 
+		# changed clear schedule.
+		if form.cleaned_data['schedule_length'] != profile.schedule_length:
+			profile.schedule = None
+			profile.save()
+
+		
 		return redirect('planner:home')
 		
 
