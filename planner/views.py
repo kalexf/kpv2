@@ -218,7 +218,7 @@ def settings(request):
 		form.save()
 		# Check if user has changed schedule length setting, if it has been 
 		# changed clear schedule.
-		if form.cleaned_data['schedule_length'] != profile.schedule_length:
+		if form['schedule_length'] != profile.schedule_length:
 			profile.schedule = None
 			profile.save()
 

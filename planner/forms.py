@@ -2,7 +2,7 @@ from django import forms
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile)
-from .models import DIFF_CHOICES, DOW_CHOICES, WEEKS_CHOICES
+from .models import DIFF_CHOICES, WEEKS_CHOICES
 
 
 
@@ -32,13 +32,13 @@ class Profile_Form(forms.ModelForm):
 	class Meta:
 		model = Profile
 		fields = [
-		'start_day',
+		
 		'mileage_target',
 		'mileage_increment',
 		'schedule_length',
 		]
 		labels = {
-		'start_day':'Initial Day of week for new schedules',
+		
 		'mileage_target':'Weekly distance target (km)',
 		'mileage_increment':'Weekly distance increase (km).',
 		'schedule_length':'How many weeks should one schedule cycle be?'

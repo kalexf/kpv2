@@ -50,6 +50,7 @@ DIFF_CHOICES = [
 	('3','Hard')
 	]
 # Day of week choices iterable for profile preferences.
+"""
 DOW_CHOICES = [
 	(0,'Monday'),
 	(1,'Tuesday'),
@@ -59,6 +60,7 @@ DOW_CHOICES = [
 	(5,'Saturday'),
 	(6,'Sunday')
 	]
+"""	
 # Used for Number of weeks / schedule preference
 WEEKS_CHOICES = [
 		(1,'1 Week'),
@@ -85,13 +87,7 @@ class Profile(models.Model):
 		default=2,
 		choices=WEEKS_CHOICES,
 		)
-	# Day of week used as initial day for new schedule.
-	# MAY DELETE THIS
-	start_day = models.PositiveSmallIntegerField(
-		
-		default=0,
-		choices=DOW_CHOICES
-		)
+	
 	# Aimed for weekly distance (limit)
 	mileage_target = models.DecimalField(
 		max_digits=5,
