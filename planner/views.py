@@ -139,16 +139,16 @@ def get_schedule_list_alt(profile):
 		# Combine number lists to make correct list of plan days, according to
 		# plan length anc current week
 		if schedule_week == 0:
-			plan_days = a.extend(b)
+			plan_days = a + b
 		if schedule_week == 1:
 			if weeks == 2: 
-				plan_days = b.extend(a)
+				plan_days = b + a
 			if weeks == 4:
-				plan_days = b.extend(c)
+				plan_days = b + c
 		if schedule_week == 2:
-			plan_days = c.extend(d)
+			plan_days = c + d
 		if schedule_week == 3:
-			plan_days = d.extend(a)			 
+			plan_days = d + a		 
 		
 	# for loop 14, looking up corresponding plan day for each schedule day
 
