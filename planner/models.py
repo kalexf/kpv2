@@ -79,11 +79,11 @@ class Profile(models.Model):
 		User, 
 		on_delete=models.CASCADE
 		)
-	# Python object converted to JSON which holds user's schedule information
-	schedule = models.JSONField(null=True)
+	# Python object converted to JSON which holds user's plan information
+	plan = models.JSONField(null=True)
 	last_exercise = models.DateField(null=True)
 	# How many weeks the schedule will run for
-	schedule_length = models.PositiveSmallIntegerField(
+	plan_length = models.PositiveSmallIntegerField(
 		default=2,
 		choices=WEEKS_CHOICES,
 		)

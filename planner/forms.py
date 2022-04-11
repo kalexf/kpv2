@@ -35,13 +35,13 @@ class Profile_Form(forms.ModelForm):
 		
 		'mileage_target',
 		'mileage_increment',
-		'schedule_length',
+		'plan_length',
 		]
 		labels = {
 		
 		'mileage_target':'Weekly distance target (km)',
 		'mileage_increment':'Weekly distance increase (km).',
-		'schedule_length':'How many weeks should one schedule cycle be?'
+		'plan_length':'How many weeks should one plan cycle be?'
 		
 		}
 		

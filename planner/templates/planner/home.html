@@ -42,9 +42,9 @@
         {% if no_sch_message %}
           <p>{{no_sch_message}}</p> 
         {% endif %}    
-        <!-- links for creating / editing profile and schedule-->
+        <!-- links for creating / editing profile and plan-->
         <p>
-          <a href="{% url 'planner:generate' %}">Create / Edit Schedule</a>
+          <a href="{% url 'planner:generate' %}">Create / Edit Training Plan</a>
         </p>  
         <p>    
           <a href="{% url 'planner:settings' %}">Edit User Preferences</a>
@@ -81,10 +81,6 @@
 
 
 
-    <p>Tests</p>
-      <p>schedule lists</p>
-        {% for item in schedule_list %}
-          <p>{{item.date_str}}|{{item.name}}</p>
-        {% endfor %}
+   
  
     {% endblock content %}

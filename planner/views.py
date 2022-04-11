@@ -67,14 +67,14 @@ def home(request):
 		context['activities'] = activities
 		
 		# schedule_list should be list of Day objects.
-		if profile.schedule:
+		if profile.plan:
 			# 'alt' for testing better version of function, rename
-			schedule_list = get_schedule_list_alt(profile)
+			schedule_list = get_schedule_list(profile)
 			context['schedule_list'] = schedule_list
 		else:
-			#no schedule, message to create one
+			# no plan, message to create one
 			message = 'Use links below to create activities/ plan'
-			context['no_sch_message'] = message
+			context['no_plan_message'] = message
 
 
 	
@@ -82,7 +82,7 @@ def home(request):
 
 class Day:
 	"""
-	For constructing schedule object used for schedule object on hom screen
+	For constructing schedule list object used on home page
 	"""
 	def __init__(self,date,name='Rest Day'):
 		self.date_str = date.strftime("%a %d %b")
@@ -90,11 +90,11 @@ class Day:
 			self.date_str = 'Today'
 		self.name = name
 
-def get_schedule_list_alt(profile):
+def get_schedule_list(profile):
 	"""
 	alternative improved version, change docstring
 	"""
-	# Get date the schedule will start on
+	# Get date schedule will start from.
 	start_date = get_initial_date(date.today())
 	# If user has no initial date, create one. Initial date is used to track
 	# how many weeks of current plan cycle have passed.	
@@ -102,8 +102,8 @@ def get_schedule_list_alt(profile):
 		profile.schedule_init_date = start_date
 		profile.save()
 	
-	# Load 'schedule'##PLAN## dictionary containing user's activity pattern
-	plan = json.loads(profile.schedule)
+	# Load user's activity pattern 'plan'.
+	plan = json.loads(profile.plan)
 	# Create empty schedule list with correct dates, names all 'rest' 
 	sch_list = []
 	for i in range(14):
@@ -111,7 +111,7 @@ def get_schedule_list_alt(profile):
 		sch_list.append(day)
 	
 	# Schedule length in weeks
-	weeks = profile.schedule_length
+	weeks = profile.plan_length
 	# Plan_days = List of integers, represents which days from user's plan will 
 	# be used to create current schedule instance.
 	### replace with range when working
@@ -194,8 +194,8 @@ def settings(request):
 		form.save()
 		# Check if user has changed schedule length setting, if it has been 
 		# changed clear schedule.
-		if form['schedule_length'] != profile.schedule_length:
-			profile.schedule = None
+		if form['plan_length'] != profile.plan_length:
+			profile.plan = None
 			profile.save()
 
 		
@@ -210,13 +210,13 @@ def generate_schedule(request):
 	"""
 	context ={}
 	profile = get_profile(request.user)
-	weeks = profile.schedule_length
+	weeks = profile.plan_length
 	choices = get_schedule_choices(request.user)
 	if len(choices) == 1:
 		message = "You need to create some activities before making a schedule"
 		context['message'] = message
 	try:
-		initial_dict = json.loads(profile.schedule)
+		initial_dict = json.loads(profile.plan)
 	except:
 		initial_dict = {}
 	# Generate form with correct number of fields.	
@@ -230,13 +230,13 @@ def generate_schedule(request):
 		schedule_dict = request.POST.dict()
 		schedule_dict.pop('csrfmiddlewaretoken')
 		schedule_dict.pop('submit')	
-		profile.schedule = json.dumps(schedule_dict)
+		profile.plan = json.dumps(schedule_dict)
 		profile.save()
 		
 
 	
 	
-	# CHANGE TO profile.schedule_length
+	
 	context['form'] = form
 	# get_lists will return dictionary containing n =weeks lists of day names,
 	# this is used to determine how many table rows will be created in template	
