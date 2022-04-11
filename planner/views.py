@@ -68,8 +68,8 @@ def home(request):
 		
 		# schedule_list should be list of Day objects.
 		if profile.schedule:
-		
-			schedule_list = get_schedule_list(profile)
+			# 'alt' for testing better version of function, rename
+			schedule_list = get_schedule_list_alt(profile)
 			context['schedule_list'] = schedule_list
 		else:
 			#no schedule, message to create one
@@ -90,99 +90,76 @@ class Day:
 			self.date_str = 'Today'
 		self.name = name
 
-def get_schedule_list(profile):
+def get_schedule_list_alt(profile):
 	"""
-	Generate list of 14 'Day' objects used to display next two weeks on home
+	alternative improved version, change docstring
 	"""
+	# Get date the schedule will start on
+	start_date = get_initial_date(date.today())
+	# If user has no initial date, create one. Initial date is used to track
+	# how many weeks of current plan cycle have passed.	
+	if not profile.schedule_init_date:
+		profile.schedule_init_date = start_date
+		profile.save()
 	
-	# Get initial Monday.
-	start_date = get_initial_date(date.today()) 
-	# Empty list
-	weeks = profile.schedule_length
-	# Get JSON dictionary for act_id lookups
-	schedule = json.loads(profile.schedule)
-	
-
-	# Create blank sch_list object, length 14, 
-	# with correct dates and value preset to 'rest'. 
+	# Load 'schedule'##PLAN## dictionary containing user's activity pattern
+	plan = json.loads(profile.schedule)
+	# Create empty schedule list with correct dates, names all 'rest' 
 	sch_list = []
 	for i in range(14):
 		day = Day(start_date+timedelta(days=i),'Rest Day')
 		sch_list.append(day)
 	
-	# Calculate the difference between im(d.t) and schedule start
-	if not profile.schedule_init_date:
-		profile.schedule_init_date = get_initial_date(date.today())
-		profile.save()
-
-	
-
-	# Work out which week of schedule we are on
+	# Schedule length in weeks
+	weeks = profile.schedule_length
+	# Plan_days = List of integers, represents which days from user's plan will 
+	# be used to create current schedule instance.
+	### replace with range when working
+	plan_days = [1,2,3,4,5,6,7,1,2,3,4,5,6,7]
+	# 1 Week plan will always use this 14-day schedule format
+	# Longer plans will vary depending on which week of schedule user is on
+	# Schedule week represents which week of their schedule cycle user is on
+	schedule_week = 0
+	# Replace with range() when working
+	a = [1,2,3,4,5,6,7]
+	b = [8,9,10,11,12,13,14]
+	c = [15,16,17,18,19,20,21]
+	d = [22,23,24,25,26,27,28]
 	if weeks != 1:
-		schedule_week = 0 
 		date_diff = profile.schedule_init_date - get_initial_date(date.today())
-		if date_diff.days >= 7 and date_diff.days <= 28:
-			schedule_week = delta.days / 7
+		if date_diff.days >= 7:
+			schedule_week = date_diff.days / 7
+			# If user has completed final week of current schdeule, reset
+			# to week 0
+			if schedule_week >= weeks:
+				schedule_week = 0
+				profile.schedule_init_date = get_initial_date(date.today)
+				profile.save()
 
-		# check on if clause if schedule_week > 4:
-				
-			
-
-	# One week schedule
-	if weeks == 1:
-		# Copy values from schedule to schedule_list
-		for i in range(1,7):
-			day_val = schedule[f'day_{i}']
-			if day_val != 'REST':
-				
-				act = get_act(day_val)
-				sch_list[i-1].name = act.name
-				sch_list[i+6].name = act.name
-
-
-
-
-	# Two week schedule  
-	if weeks == 2:
-		# 3rd week or later: reset to first week.
-		if schedule_week > 1:
-			schedule_week = 0
-			profile.schedule_init_date = get_initial_date(date.today())
-		# Second week, invert schedule weeks
-		if schedule_week == 1:
-			#Second week: invert schedule weeks
-			a = schedule[:6]
-			b = schedule[7:13]
-
-			schedule = b + a
-
-		# Copy values into schedule_list
-
-		for i in range(1,14):
-			day_val = schedule[f'day_{i}']
-			if day_val != 'REST':
-				act = get_act(day_val)
-				sch_list[i].name = act.name
-
-	# Four week schedule - get relevant two slices of schedule
-	if weeks == 4:
-		if schedule_week > 3:
-			schedule_week = 0
-			profile.schedule_init_date = get_initial_date(date.today())
-			profile.save()
+		# Combine number lists to make correct list of plan days, according to
+		# plan length anc current week
 		if schedule_week == 0:
-			a = schedule[:13]
+			plan_days = a.extend(b)
 		if schedule_week == 1:
-			a = schedule[6:20]
+			if weeks == 2: 
+				plan_days = b.extend(a)
+			if weeks == 4:
+				plan_days = b.extend(c)
 		if schedule_week == 2:
-			a = schedule[13:27]
+			plan_days = c.extend(d)
 		if schedule_week == 3:
-			a = schedule[20:27] + schedule[0:6]	
-		schedule = a
+			plan_days = d.extend(a)			 
+		
+	# for loop 14, looking up corresponding plan day for each schedule day
 
-								
-	return sch_list	
+	for i in range(14):
+		day_value = plan[f'day_{plan_days[i]}']
+		if day_value != 'REST':
+			activity = get_act(day_value)
+			sch_list[i].name = activity.name
 
+	return sch_list
+					
 
 def get_initial_date(t_day):
 	"""
