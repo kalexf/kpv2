@@ -8,16 +8,16 @@ from .models import DIFF_CHOICES, WEEKS_CHOICES
 
 
 
-class ScheduleForm(forms.Form):
+class PlanForm(forms.Form):
 	"""
-	Dynamic form used for schedule creation page.
+	Dynamic form used for training plan creation page.
 	On init needs to be given integer 'weeks' which is used to determine
 	number of fields, and list of 2-tuples 'choices', which is used to create
-	DD menus for each field. 
+	select menus for each field. 
 	"""
 
 	def __init__(self,weeks,choices,initial_dict=None):
-		super(ScheduleForm,self).__init__()
+		super(PlanForm,self).__init__()
 		for i in range(weeks * 7):
 			self.fields[f'day_{i+1}'] = forms.ChoiceField(choices=choices)
 		# if initial values have been given, set them

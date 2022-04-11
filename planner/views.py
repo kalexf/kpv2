@@ -6,7 +6,7 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile,)
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
 	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
-	Profile_Form, ScheduleForm )
+	Profile_Form, PlanForm )
 
 
 
@@ -73,7 +73,7 @@ def home(request):
 			context['schedule_list'] = schedule_list
 		else:
 			#no schedule, message to create one
-			message = 'Use links below to create activities/ schedule'
+			message = 'Use links below to create activities/ plan'
 			context['no_sch_message'] = message
 
 
@@ -220,13 +220,13 @@ def generate_schedule(request):
 	except:
 		initial_dict = {}
 	# Generate form with correct number of fields.	
-	form = ScheduleForm(weeks,choices,initial_dict)
+	form = PlanForm(weeks,choices,initial_dict)
 
 	
 	if request.method == 'POST':
 		#check and save form
 		
-		form = ScheduleForm(weeks,choices,request.POST)
+		form = PlanForm(weeks,choices,request.POST)
 		schedule_dict = request.POST.dict()
 		schedule_dict.pop('csrfmiddlewaretoken')
 		schedule_dict.pop('submit')	
