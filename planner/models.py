@@ -75,6 +75,7 @@ class Profile(models.Model):
 	# Used to track date which corresponds to first day of shchedule where
 	# sch_length > 1. 
 	schedule_init_date = models.DateField(null=True)
+	schedule_week = models.PositiveSmallIntegerField(default=0)
 	owner = models.ForeignKey(
 		User, 
 		on_delete=models.CASCADE

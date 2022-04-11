@@ -94,60 +94,59 @@ def get_schedule_list(profile):
 	"""
 	alternative improved version, change docstring
 	"""
-	# Get date schedule will start from.
-	start_date = get_initial_date(date.today())
-	# If user has no initial date, create one. Initial date is used to track
-	# how many weeks of current plan cycle have passed.	
+
+	# Check schedule initial date / today difference. 
 	if not profile.schedule_init_date:
-		profile.schedule_init_date = start_date
+		profile.schedule_init_date = get_initial_date(date.today())
+
+	date_diff = date.today() - profile.schedule_init_date
+	if date_diff.days >= 7:
+		# At least one week has passed, reset schedule initial date.
+		profile.schedule_week += 1
+		profile.schedule_init_date = get_initial_date(date.today())
+		if profile.schedule_week >= profile.plan_length:
+			# Passed end of plan, reset to week 0
+
+			profile.schedule_week = 0 
 		profile.save()
-	
+
 	# Load user's activity pattern 'plan'.
 	plan = json.loads(profile.plan)
 	# Create empty schedule list with correct dates, names all 'rest' 
 	sch_list = []
+	start_date = profile.schedule_init_date
 	for i in range(14):
 		day = Day(start_date+timedelta(days=i),'Rest Day')
 		sch_list.append(day)
 	
-	# Schedule length in weeks
-	weeks = profile.plan_length
+	
 	# Plan_days = List of integers, represents which days from user's plan will 
 	# be used to create current schedule instance.
 	### replace with range when working
 	plan_days = [1,2,3,4,5,6,7,1,2,3,4,5,6,7]
 	# 1 Week plan will always use this 14-day schedule format
 	# Longer plans will vary depending on which week of schedule user is on
-	# Schedule week represents which week of their schedule cycle user is on
-	schedule_week = 0
-	# Replace with range() when working
+	
+	### Replace with range() when working?
 	a = [1,2,3,4,5,6,7]
 	b = [8,9,10,11,12,13,14]
 	c = [15,16,17,18,19,20,21]
 	d = [22,23,24,25,26,27,28]
-	if weeks != 1:
-		date_diff = profile.schedule_init_date - get_initial_date(date.today())
-		if date_diff.days >= 7:
-			schedule_week = date_diff.days / 7
-			# If user has completed final week of current schdeule, reset
-			# to week 0
-			if schedule_week >= weeks:
-				schedule_week = 0
-				profile.schedule_init_date = get_initial_date(date.today)
-				profile.save()
 
+	if profile.plan_length != 1:
+		week = profile.schedule_week
 		# Combine number lists to make correct list of plan days, according to
 		# plan length anc current week
-		if schedule_week == 0:
+		if week == 0:
 			plan_days = a + b
-		if schedule_week == 1:
-			if weeks == 2: 
+		if week == 1:
+			if profile.plan_length == 2: 
 				plan_days = b + a
-			if weeks == 4:
+			if profile.plan_length == 4:
 				plan_days = b + c
-		if schedule_week == 2:
+		if week == 2:
 			plan_days = c + d
-		if schedule_week == 3:
+		if week == 3:
 			plan_days = d + a		 
 		
 	# for loop 14, looking up corresponding plan day for each schedule day
