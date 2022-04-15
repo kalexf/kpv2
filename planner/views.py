@@ -3,7 +3,7 @@ from datetime import date, timedelta, datetime
 import json
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
-	Profile,)
+	Profile, CompletedAct)
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
 	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
 	Profile_Form, PlanForm )
@@ -64,7 +64,7 @@ def home(request):
 		# Get user's activities for home screen list
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
-		
+		# If
 		# If user has plan, create schedule.
 		if profile.plan:
 			schedule_list = get_schedule_list(profile)
@@ -294,6 +294,17 @@ def submit(request, act_id):
 		activity = get_act(request.POST.get('act_id'))
 		model = get_model(activity.my_type)
 		this_act = model.objects.get(id=act_id)
+		# create CompletedAct entry 
+		# will need to expand values.
+		history = CompletedAct(
+			owner=request.user,
+			date_done=date.today(),
+			)
+
+
+
+		history.save()
+
 		# Update Activity values from Post data
 		this_act.update(request.POST)
 		
@@ -385,12 +396,7 @@ def delete(request, act_id=None):
 		activity = get_act(act_id)
 		activity.delete()
 		return redirect('planner:home')
-
-
-
 	
-
-
 
 def setgoal(request):
 	"""Saves values returned from set goal forms when editing or creating"""
