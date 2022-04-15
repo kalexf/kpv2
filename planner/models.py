@@ -105,7 +105,14 @@ class Profile(models.Model):
 		default=0.0)
 	
 
-
+class CompletedAct(models.Model):
+	"""
+	Object used to hold information on completed runs.
+	"""
+	class Meta:
+		ordering = ['date_done']
+	owner = models.ForeignKey(User, on_delete=models.CASCADE)	
+	date_done = models.DateField(null=True)	
 
 # Parent class for all exercise types. All required fields / attributes here,
 # exercise-specific fields / attributes / methods go on exercise sub-classes.
