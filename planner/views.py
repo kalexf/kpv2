@@ -294,15 +294,13 @@ def submit(request, act_id):
 		activity = get_act(request.POST.get('act_id'))
 		model = get_model(activity.my_type)
 		this_act = model.objects.get(id=act_id)
-		# create CompletedAct entry 
-		# will need to expand values.
+		# create CompletedAct entry. Created / saved before progression to get
+		# accurate values for activity name. 
 		history = CompletedAct(
 			owner=request.user,
 			date_done=date.today(),
+			name = this_act.name
 			)
-
-
-
 		history.save()
 
 		# Update Activity values from Post data

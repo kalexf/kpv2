@@ -112,7 +112,8 @@ class CompletedAct(models.Model):
 	class Meta:
 		ordering = ['date_done']
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)	
-	date_done = models.DateField(null=True)	
+	date_done = models.DateField(null=True)
+	name = models.CharField(max_length=40,default='namenlose')	
 
 # Parent class for all exercise types. All required fields / attributes here,
 # exercise-specific fields / attributes / methods go on exercise sub-classes.
@@ -175,7 +176,11 @@ class PacedRun(Activity):
 	description = ACTIVITY_DESCRIPTIONS[0]['description']
 	# Determines whether the activity tracks time or distance
 	PROG_CHOICES = [('TIME','Time(minutes)'),('DIST','Distance(km)'),] 
-	prog_value = models.CharField(max_length=4, choices=PROG_CHOICES,default=PROG_CHOICES[0][1])
+	prog_value = models.CharField(
+		max_length=4, 
+		choices=PROG_CHOICES,
+		default=PROG_CHOICES[0][0]
+		)
 	
 	# Progression values - amount by which activity values increased/ decreased
 	prog_minutes = models.PositiveSmallIntegerField(null=True,blank=True)
@@ -208,12 +213,12 @@ class PacedRun(Activity):
 	def progress(self):
 		"""Increas the activity's base value by its progression value"""
 		# Progressing time
-		if self.prog_value == self.PROG_CHOICES[1][1]:
+		if self.prog_value == self.PROG_CHOICES[0][0]:
 			self.minutes += self.prog_minutes
 			if self.minutes and self.minutes >= self.goal_minutes:
 				self.progressive = False
 		# Progressing Distance		
-		elif self.prog_value == self.PROG_CHOICES[2][1]:
+		elif self.prog_value == self.PROG_CHOICES[1][0]:
 			self.distance += self.prog_distance
 			if self.distance and self.distance >= self.goal_distance:
 				self.progressive = False
