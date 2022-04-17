@@ -113,7 +113,11 @@ class CompletedAct(models.Model):
 		ordering = ['date_done']
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)	
 	date_done = models.DateField(null=True)
-	name = models.CharField(max_length=40,default='namenlose')	
+	name = models.CharField(max_length=40,default='namenlose')
+	distance = models.DecimalField(
+		max_digits=5,
+		decimal_places=2,
+		null=True)	
 
 # Parent class for all exercise types. All required fields / attributes here,
 # exercise-specific fields / attributes / methods go on exercise sub-classes.
