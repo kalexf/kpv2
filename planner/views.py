@@ -88,10 +88,13 @@ class Day:
 			self.date_str = 'Today'
 		self.name = name
 
-def get_schedule_list(profile):
+def get_schedule_list(profile,replace=True):
 	"""
 	Creates a list of 14 'day' objects, based on user's plan. Used on home
 	screen to display two week schedule.
+	if replace=True, will check schedule against completed activities, if any
+	dates overlap the scheduled activity will be replaced with the completed
+	activity.
 	"""
 
 	# Check how many days have passed since the initial date of current schedule
@@ -153,6 +156,19 @@ def get_schedule_list(profile):
 		if day_value != 'REST':
 			activity = get_act(day_value)
 			sch_list[i].name = activity.name
+	
+	if replace == True:
+		# Look up user's completed activities
+		past_acts = CompletedAct.objects.filter(owner=profile.owner)
+		
+		for day in sch_list:
+			for past_act in past_acts:
+				if day.date_str == past_act.date_done.strftime("%a %d %b"):
+					day.name = past_act.name
+			if day.date_str == 'Today':
+				for past_act in past_acts:
+					if past_act.date_done == date.today():
+						day.name = past_act.name		
 
 	return sch_list
 					
@@ -296,10 +312,14 @@ def submit(request, act_id):
 		this_act = model.objects.get(id=act_id)
 		# create CompletedAct entry. Created / saved before progression to get
 		# accurate values for activity name. 
+		distance = this_act.distance or 0
+		
+
 		history = CompletedAct(
 			owner=request.user,
 			date_done=date.today(),
-			name = this_act.name
+			name = this_act.name,
+			distance=distance,
 			)
 		history.save()
 
@@ -311,14 +331,7 @@ def submit(request, act_id):
 		this_act.setvalues()
 		this_act.save()
 
-
 	return redirect('planner:home')	
-
-		# Set act values to form values, save, redirect
-
-
-
-
 
 
 
