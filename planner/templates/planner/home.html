@@ -21,6 +21,15 @@
                 </td>
                 {% endfor %}
               </tr>
+              <tr>
+                {% for day in schedule_list|slice:":7" %}
+                <td>
+                    {% if day.complete %}
+                      Completed
+                    {% endif %}  
+                </td>
+                {% endfor %}
+              </tr>
               <!-- schedule week two -->
               <tr>
                 {% for day in schedule_list|slice:"7:14" %}
@@ -35,6 +44,7 @@
                   {{day.name}}
                 </td>
                 {% endfor %}
+                
             </table>  
                 
         
@@ -74,7 +84,8 @@
     
 
        
-       {% else %} <p>Please log in /register </p>
+       {% else %} 
+         <p>Please log in /register </p>
        {% endif %} 
     
 

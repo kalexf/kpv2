@@ -80,13 +80,14 @@ def home(request):
 
 class Day:
 	"""
-	For constructing schedule list object used on home page
+	For constructing schedule list used on home page
 	"""
 	def __init__(self,date,name='Rest Day'):
 		self.date_str = date.strftime("%a %d %b")
 		if date == date.today():
 			self.date_str = 'Today'
 		self.name = name
+		self.complete = False
 
 def get_schedule_list(profile,replace=True):
 	"""
@@ -165,10 +166,12 @@ def get_schedule_list(profile,replace=True):
 			for past_act in past_acts:
 				if day.date_str == past_act.date_done.strftime("%a %d %b"):
 					day.name = past_act.name
+					day.complete = True
 			if day.date_str == 'Today':
 				for past_act in past_acts:
 					if past_act.date_done == date.today():
-						day.name = past_act.name		
+						day.name = past_act.name
+						day.complete = True		
 
 	return sch_list
 					
