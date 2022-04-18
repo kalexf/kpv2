@@ -209,6 +209,8 @@ def settings(request):
 		# Check if user has changed plan length setting, if it has been 
 		# changed clear plan.
 		if form['plan_length'] != profile.plan_length:
+			
+			profile.schedule_week = 0
 			profile.plan = None
 			profile.save()
 
