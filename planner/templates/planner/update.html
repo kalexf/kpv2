@@ -1,0 +1,12 @@
+{% extends 'planner/base.html' %}
+
+{% block content %}
+  <!--Create table where user can confirm whether past acitivities completed or not-->
+  {% if update_list %}
+  {% for day in update_list %}
+    {{day.date_str}}{{day.name}}{{day.complete}}{{day.act_id}}
+  {% endfor %}  
+  {% else %} <p>No update list</p> <!--cut-->
+  {% endif %}
+
+{% endblock content %}
