@@ -48,6 +48,7 @@ SUB_FORMS = {
 
 
 
+
 def home(request):
 	"""
 	Displays schedule, activities, links for edit/ creation screen.
@@ -58,6 +59,7 @@ def home(request):
 	# Get a list of the user's activities to display on home screen
 	if request.user.is_authenticated:
 		
+
 		# Get User profile
 		profile = get_profile(request.user)
 		
@@ -68,6 +70,18 @@ def home(request):
 		# If user has plan, create schedule.
 		if profile.plan:
 			schedule_list = get_schedule_list(profile)
+			# Check if schedule list has uncompleted parts, if it does redirect 
+			# to confirmation screen to update
+			update_list = update_schedule(schedule_list)
+			
+			if not update_list:
+				return render(
+					request,
+					'planner/update.html',
+					context={'update_list':update_list},
+					)
+			
+
 			context['schedule_list'] = schedule_list
 		else:
 			# No plan, prompt message to create one
@@ -77,6 +91,22 @@ def home(request):
 
 	
 	return render(request,'planner/home.html', context)
+
+def update_schedule(schedule_list):
+	"""
+	returns days that need updating, or 0 if there are none
+	"""
+	update_list = []
+	for day in schedule_list:
+		# iterate over schedule days up to today.
+		if day.date_str == 'Today':
+			break
+		# Add any that are incomplete And not rest days to list.
+		if not day.complete and day.name != 'Rest Day':
+			update_list.append(day)
+	if update_list:
+		return update_list
+	return 0
 
 class Day:
 	"""
@@ -88,6 +118,7 @@ class Day:
 			self.date_str = 'Today'
 		self.name = name
 		self.complete = False
+		self.act_id = 0
 
 def get_schedule_list(profile,replace=True):
 	"""
@@ -157,6 +188,7 @@ def get_schedule_list(profile,replace=True):
 		if day_value != 'REST':
 			activity = get_act(day_value)
 			sch_list[i].name = activity.name
+			sch_list[i].act_id = day_value
 	
 	if replace == True:
 		# Look up user's completed activities
@@ -298,7 +330,7 @@ def testview(request):
 
 	return render(request,'planner/testtemplate.html')
 
-def submit(request, act_id):
+def submit(request, act_id,date_string=None):
 	"""Serve page where user can submit details of completed activity"""
 	# Get activity
 	
@@ -318,7 +350,11 @@ def submit(request, act_id):
 		# create CompletedAct entry. Created / saved before progression to get
 		# accurate values for activity name. 
 		distance = this_act.distance or 0
-		
+		if not date_string:
+			date = date.today()
+		else:
+			date = strftime	
+
 
 		history = CompletedAct(
 			owner=request.user,

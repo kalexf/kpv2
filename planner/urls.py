@@ -16,6 +16,7 @@ urlpatterns = [
 	path('edit/<int:act_id>/',views.edit,name='edit'),
 	# Submit details of completed activity
 	path('submit/<int:act_id>/',views.submit,name='submit'),
+	path('submit/<int:act_id>/<str:date_str>',views.submit,name='submit'),
 	path('generate/',views.generate_plan,name='generate'),
 	path('settings',views.settings,name='settings'),
 	]
