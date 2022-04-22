@@ -3,13 +3,33 @@
 {% block content %}
   <!--Create table where user can confirm whether past acitivities completed or not-->
   {% if update_list %}
-  {% for day in update_list %}
-    <!-- link to complete the activity-->
-    <form method='POST' action="{% url 'planner:submit' day.act_id %}">
-      {% csrf_token %}
-    </form>
-    {{day.date_str}}{{day.name}}{{day.complete}}{{day.act_id}}
-  {% endfor %}  
+  <table>
+    <tr>
+      {% for day in update_list %}
+        <td>{{day.date_iso}}</td>
+      {% endfor %}
+    </tr>
+    <tr>
+      {% for day in update_list %}
+        <td>{{day.name}}</td>
+      {% endfor %}
+    </tr>
+    <tr>
+      {% for day in update_list %}
+        <td>
+          <a href="{% url 'planner:submitdate' day.act_id day.date_iso %}">Performed Activity</a>
+        </td>
+      {% endfor %}
+    <tr>
+      {% for day in update_list %}
+        <td>
+          <a href="{% url 'planner:restdate' day.date_iso %}">Did not complete.</a>
+        </td>
+      {% endfor %}
+    </tr>      
+
+
+  
   {% else %} <p>No update list</p> <!--cut-->
   {% endif %}
 

@@ -117,7 +117,8 @@ class CompletedAct(models.Model):
 	distance = models.DecimalField(
 		max_digits=5,
 		decimal_places=2,
-		null=True)	
+		null=True)
+			
 
 # Parent class for all exercise types. All required fields / attributes here,
 # exercise-specific fields / attributes / methods go on exercise sub-classes.

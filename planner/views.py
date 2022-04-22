@@ -45,7 +45,8 @@ SUB_FORMS = {
 	ACT_TYPES[2].act_type:TT_SubForm,
 	ACT_TYPES[3].act_type:SubmissionForm,
 	}
-
+# Used with date.strptime, strftime.
+dateFormat = "%a %d %b"
 
 
 
@@ -74,7 +75,7 @@ def home(request):
 			# to confirmation screen to update
 			update_list = update_schedule(schedule_list)
 			
-			if not update_list:
+			if update_list:
 				return render(
 					request,
 					'planner/update.html',
@@ -112,13 +113,15 @@ class Day:
 	"""
 	For constructing schedule list used on home page
 	"""
-	def __init__(self,date,name='Rest Day'):
-		self.date_str = date.strftime("%a %d %b")
-		if date == date.today():
+	def __init__(self,day_date,name='Rest Day'):
+		self.date_str = day_date.strftime(dateFormat)
+		if day_date == date.today():
 			self.date_str = 'Today'
 		self.name = name
 		self.complete = False
 		self.act_id = 0
+		# Added to fix a bug where schedule spanned new year
+		self.date_iso = day_date.isoformat()
 
 def get_schedule_list(profile,replace=True):
 	"""
@@ -196,7 +199,7 @@ def get_schedule_list(profile,replace=True):
 		
 		for day in sch_list:
 			for past_act in past_acts:
-				if day.date_str == past_act.date_done.strftime("%a %d %b"):
+				if day.date_str == past_act.date_done.strftime(dateFormat):
 					day.name = past_act.name
 					day.complete = True
 			if day.date_str == 'Today':
@@ -330,7 +333,7 @@ def testview(request):
 
 	return render(request,'planner/testtemplate.html')
 
-def submit(request, act_id,date_string=None):
+def submit(request,act_id,date_iso=None):
 	"""Serve page where user can submit details of completed activity"""
 	# Get activity
 	
@@ -350,15 +353,17 @@ def submit(request, act_id,date_string=None):
 		# create CompletedAct entry. Created / saved before progression to get
 		# accurate values for activity name. 
 		distance = this_act.distance or 0
-		if not date_string:
-			date = date.today()
+		
+		# Get correct date if submitted from update view. 
+		if not date_iso:
+			date_done = date.today()
 		else:
-			date = strftime	
+			date_done = date.fromisoformat(date_iso)
 
 
 		history = CompletedAct(
 			owner=request.user,
-			date_done=date.today(),
+			date_done=date_done,
 			name = this_act.name,
 			distance=distance,
 			)
@@ -374,7 +379,22 @@ def submit(request, act_id,date_string=None):
 
 	return redirect('planner:home')	
 
+def restdate(request,date_iso):
+	"""
+	Creates a rest day with the given date.
+	"""
+	# Create and save a completed act object with no associated act / distance.
+	date_done = date.fromisoformat(date_iso)
 
+	
+	history = CompletedAct(
+		owner=request.user,
+		date_done=date_done,
+		name='Rest Day',
+		distance=0.0
+		)
+	history.save()
+	return redirect('planner:home')	
 
 def get_profile(user):
 	"""
