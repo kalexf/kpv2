@@ -67,6 +67,7 @@ def home(request):
 		# Get user's activities for home screen list
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
+		context['date_iso'] = date.today().isoformat()
 		# If
 		# If user has plan, create schedule.
 		if profile.plan:
@@ -333,7 +334,7 @@ def testview(request):
 
 	return render(request,'planner/testtemplate.html')
 
-def submit(request,act_id,date_iso=None):
+def submit(request,act_id,date_iso):
 	"""Serve page where user can submit details of completed activity"""
 	# Get activity
 	
@@ -341,7 +342,11 @@ def submit(request,act_id,date_iso=None):
 		
 		activity = get_act(act_id)	
 		form = SUB_FORMS[activity.my_type]
-		context = {'activity':activity,'form':form}
+		context = {
+		'activity':activity,
+		'form':form,
+		'date_iso':date_iso,
+		}
 		return render(request, 'planner/submit.html',context)
 
 
@@ -353,12 +358,7 @@ def submit(request,act_id,date_iso=None):
 		# create CompletedAct entry. Created / saved before progression to get
 		# accurate values for activity name. 
 		distance = this_act.distance or 0
-		
-		# Get correct date if submitted from update view. 
-		if not date_iso:
-			date_done = date.today()
-		else:
-			date_done = date.fromisoformat(date_iso)
+		date_done = date.fromisoformat(date_iso)
 
 
 		history = CompletedAct(

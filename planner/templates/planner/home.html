@@ -69,7 +69,7 @@
               {% for act in activities %}
             <tr>
               <td>{{act.name}}</td>
-              <td><a href="{% url 'planner:submit' act.id %}">Completed</td>
+              <td><a href="{% url 'planner:submitdate' act.id date_iso %}">Completed</td>
               <td><a href="{% url 'planner:edit' act.id %}">Edit</a></td>
               <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
             </tr>

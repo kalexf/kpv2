@@ -4,7 +4,7 @@
 
 <p>{{activity.name}} completed?</p>
 
-<form action="{% url 'planner:submit' activity.id %}" method="post">
+<form action="{% url 'planner:submitdate' activity.id date_iso %}" method="post">
   {% csrf_token %}
   {{form.as_p}}
   <input type = "hidden" name="act_id" value={{activity.id}}>
