@@ -191,8 +191,9 @@ def get_schedule_list(profile,replace=True):
 		day_value = plan[f'day_{plan_days[i]}']
 		if day_value != 'REST':
 			activity = get_act(day_value)
-			sch_list[i].name = activity.name
-			sch_list[i].act_id = day_value
+			if activity:
+				sch_list[i].name = activity.name
+				sch_list[i].act_id = day_value
 	
 	if replace == True:
 		# Look up user's completed activities
@@ -466,7 +467,8 @@ def delete(request, act_id=None):
 		
 		act_id = int(request.POST.get('act_id'))
 		activity = get_act(act_id)
-		activity.delete()
+		activity.delete()		
+
 		return redirect('planner:home')
 	
 
