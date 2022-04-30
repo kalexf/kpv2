@@ -54,22 +54,16 @@ def home(request):
 	"""
 	Displays schedule, activities, links for edit/ creation screen.
 	"""
-	##Testing
-	
-	context = {}
-	# Get a list of the user's activities to display on home screen
-	if request.user.is_authenticated:
-		
 
+	
+	# Declare context dictionary
+	context = {}
+	# Generate home screen if user is logged in, if not just prompt to
+	# login /register
+	if request.user.is_authenticated:
 		# Get User profile
 		profile = get_profile(request.user)
-		
-		# Get user's activities for home screen list
-		activities = Activity.objects.filter(owner=request.user)
-		context['activities'] = activities
-		context['date_iso'] = date.today().isoformat()
-		# If
-		# If user has plan, create schedule.
+		# If user has a saved plan, build schedule schedule.
 		if profile.plan:
 			schedule_list = get_schedule_list(profile)
 			# Check if schedule list has uncompleted parts, if it does redirect 
@@ -83,17 +77,24 @@ def home(request):
 					context={'update_list':update_list},
 					)
 			
+			
+			
 
 			context['schedule_list'] = schedule_list
+		
+		# Get user's activities for home screen list
 		else:
 			# No plan, prompt message to create one
 			message = 'Use links below to create activities/ plan'
 			context['no_plan_message'] = message
 
+		activities = Activity.objects.filter(owner=request.user)
+		context['activities'] = activities
+		context['date_iso'] = date.today().isoformat()
 
 	
 	return render(request,'planner/home.html', context)
-
+	
 def update_schedule(schedule_list):
 	"""
 	returns days that need updating, or 0 if there are none
