@@ -72,6 +72,9 @@ WEEKS_CHOICES = [
 class Profile(models.Model):
 	"""Stores information about user used to generate schedule and track
 	statistics. Any information not related to a specific activity saved here"""
+	# Used to store current week, for tracking weekly distance. Updated when
+	# week ends and distance stored in history.
+	current_week_initial = models.DateField(null=True,blank=True)
 	# Used to track date which corresponds to first day of shchedule where
 	# sch_length > 1. 
 	schedule_init_date = models.DateField(null=True)
@@ -82,6 +85,7 @@ class Profile(models.Model):
 		)
 	# Python object converted to JSON which holds user's plan information
 	plan = models.JSONField(null=True,blank=True)
+	history = models.JSONField(null=True,blank=True)
 	last_exercise = models.DateField(null=True)
 	# How many weeks the schedule will run for
 	plan_length = models.PositiveSmallIntegerField(
