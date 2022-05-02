@@ -20,7 +20,8 @@ urlpatterns = [
 	# Submit details of rest day
 	path('submit/<str:date_iso>/',views.restdate,name='restdate'),
 	path('generate/',views.generate_plan,name='generate'),
-	path('settings',views.settings,name='settings'),
+	path('settings/',views.settings,name='settings'),
+	path('history/',views.view_history,name='history'),
 	]
 
 	# path('delete/',views.delete,name='delete'),

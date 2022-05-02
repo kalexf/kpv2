@@ -49,6 +49,21 @@ SUB_FORMS = {
 # Used with date.strptime, strftime.
 dateFormat = "%a %d %b"
 
+def view_history(request):
+	"""
+	render page showing table of weekly distance
+	"""
+	context = {}
+	profile = get_profile(request.user)
+	
+	history_list = json.loads(profile.history)
+	if not history_list:
+		context['message'] = 'No history to show yet! Please try harder.'
+	else:
+		context['history_list'] = history_list
+	context['current_week_distance'] = f'{profile.wtd_distance} KM'
+			
+	return render(request,'planner/history.html',context)	 
 
 
 def home(request):
