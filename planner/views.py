@@ -123,37 +123,8 @@ def save_to_history(profile):
 		profile.history = json.dumps(history)
 		return profile	
 
-def update_distance(profile):
-	"""
-	update distance totals and delete any completed acts which are no longer needed.
-	Return week to date total distance or 0.
-	"""
-		
-
-	return 0		
-
-def get_distance(q_set):
-	"""
-	returns the total distance value of acts in a queryset or iterable
-	as a decimal, or returns 0.0 if none. 
-	"""
-	distance_value = Decimal(0.0)
-	for act in q_set:
-		if act.distance:
-			distance_value += act.distance
 	
-	return distance_value		
 
-
-def save_mileage(start_date,end_date,distance,profile):
-	"""
-	Saves mileage values and date strings to json field on profile, which
-	is used for viewing mileage history.
-
-	"""
-	# INCLUDING THIS IN UPDATE_DISTANCE FOR NOW
-
-	return 0
 
 def update_schedule(schedule_list):
 	"""
