@@ -122,9 +122,7 @@ def save_to_history(profile):
 		history.append(entry)
 		profile.history = json.dumps(history)
 		return profile	
-
 	
-
 
 def update_schedule(schedule_list):
 	"""
@@ -409,6 +407,12 @@ def submit(request,act_id,date_iso):
 				this_act.progress()
 		this_act.setvalues()
 		this_act.save()
+		# If act is withing current date range, add it's distance value to wtd
+		profile = get_profile(request.user)
+		if distance and profile.current_week_initial:
+			if date_done < profile.current_week_initial + timedelta(days=7):
+				profile.wtd_distance += Decimal(distance)
+				profile.save()
 
 	return redirect('planner:home')	
 
