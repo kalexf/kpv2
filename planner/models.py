@@ -86,27 +86,14 @@ class Profile(models.Model):
 	# Python object converted to JSON which holds user's plan information
 	plan = models.JSONField(null=True,blank=True)
 	history = models.JSONField(null=True,blank=True)
-	last_exercise = models.DateField(null=True)
+	
 	# How many weeks the schedule will run for
 	plan_length = models.PositiveSmallIntegerField(
 		default=2,
 		choices=WEEKS_CHOICES,
 		)
 	
-	# Aimed for weekly distance (limit)
-	mileage_target = models.DecimalField(
-		max_digits=5,
-		decimal_places=2,
-		null=True,
-		blank=True,
-		)
-	# Mileage to date for current week
-	mileage = models.DecimalField(null=True,max_digits=5,decimal_places=2)
-	# How much mileage to add per week
-	mileage_increment = models.DecimalField(
-		max_digits=5,
-		decimal_places=2,
-		default=0.0)
+
 	
 
 class CompletedAct(models.Model):

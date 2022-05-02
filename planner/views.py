@@ -89,7 +89,7 @@ def home(request):
 			message = 'Use links below to create activities/ plan'
 			context['no_plan_message'] = message
 		# Update distances
-		wtd_distance = update_distance(profile)
+		
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
 		context['date_iso'] = date.today().isoformat()
@@ -103,60 +103,13 @@ def update_distance(profile):
 	update distance totals and delete any completed acts which are no longer needed.
 	Return week to date total distance or 0.
 	"""
-	# Declare decimal for week-to-date distance value.
-	wtd_distance = 0.0	
-	# Check profile has current week value
-	if not profile.current_week_initial:
-		profile.current_week_initial = get_initial_date(date.today())
-		profile.save()
-	# Check / update history for completedacts older than 1 week.
-	# Get Queryset of all user's completed activity history.	
-	completed_acts = CompletedAct.objects.filter(owner=profile.owner)
-	if completed_acts.exists():
-		start_date = profile.current_week_initial
-		end_date = start_date + timedelta(days=6)
-		# If more than a week has passsed since initial date, archive mileage
-		# and delete old CompletedActs
-		if end_date < date.today():
-			completed_acts.filter(date_done__range=[start_date,end_date])
-			# Calculate mileage of compacts in this range
-			distance = get_distance(completed_acts)
-			history = json.loads(profile.history)
-			# Create new entry
-			new_entry = {
-				'dates':f'{start_date.iso_format()} to {end_date.iso_format()}',
-				'distance':distance
-				}
-			if history:
-				# Add entry to list and save.
-				history.append(new_entry)
-				profile.history = json.dumps(new_entry)
-			else:
-				#No history, add first entry and save
-				history = [new_entry]
-				profile.history = json.dumps(history)
-				profile.save() 	
-			# Delete archived comp acts
-			completed_acts.delete()
-			new_week_initial = profile.current_week_initial + timedelta(days=7)
-			profile.current_week_initial = new_week_initial
-			profile.save()
-		completed_acts = CompletedAct.objects.filter(owner=profile.owner)
-		if completed_acts.exists():
-			wtd_distance = get_distance(completed_acts)
-			if wtd_distance:
-				return wtd_distance
-
-	
-	else:
-		# No completed_acts - nothing to update, no mileage, return 0.0
-		return wtd_distance		
+		
 
 	return 0		
 
 def get_distance(q_set):
 	"""
-	returns the total distance value of acts in a queryset (or other iterable)
+	returns the total distance value of acts in a queryset or iterable
 	as a decimal, or returns 0.0 if none. 
 	"""
 	distance_value = Decimal(0.0)

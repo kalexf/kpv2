@@ -33,8 +33,6 @@ class Profile_Form(forms.ModelForm):
 		model = Profile
 		fields = [
 		
-		'mileage_target',
-		'mileage_increment',
 		'plan_length',
 		]
 		labels = {
