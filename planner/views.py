@@ -111,7 +111,7 @@ def save_to_history(profile):
 	Returns ammended profile without saving profile.
 	"""
 	entry = {
-	'distance':profile.wtd_distance or 0,
+	'distance':f'{profile.wtd_distance}KM' or 0,
 	'date':profile.current_week_initial.isoformat() 
 	}
 	if not profile.history:
