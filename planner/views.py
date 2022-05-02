@@ -76,10 +76,7 @@ def home(request):
 					request,
 					'planner/update.html',
 					context={'update_list':update_list},
-					)
-			
-			
-			
+					)		
 
 			context['schedule_list'] = schedule_list
 		
@@ -88,15 +85,43 @@ def home(request):
 			# No plan, prompt message to create one
 			message = 'Use links below to create activities/ plan'
 			context['no_plan_message'] = message
-		# Update distances
-		
+		# Check whether date is within current_week_initial range
+		if not profile.current_week_initial:
+			profile.current_week_initial = get_initial_date(date.today())
+		if date.today() > profile.current_week_initial + timedelta(days=6):
+			#Save history and reset date
+			profile = save_to_history(profile)
+			# Reset distance and date
+			profile.current_week_initial = get_initial_date(date.today())
+			profile.wtd_distance = Decimal(0.0)
+			profile.save()
+
+
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
 		context['date_iso'] = date.today().isoformat()
-		context['wtd_distance'] = wtd_distance
+		context['wtd_distance'] = profile.wtd_distance
 
 	
 	return render(request,'planner/home.html', context)
+
+def save_to_history(profile):
+	"""
+	Update history field with date and distance total. 
+	Returns ammended profile without saving profile.
+	"""
+	entry = {
+	'distance':profile.wtd_distance or 0,
+	'date':profile.current_week_initial.isoformat() 
+	}
+	if not profile.history:
+		profile.history = json.dumps([entry])
+		return profile
+	else:
+		history = json.loads(profile.history)
+		history.append(entry)
+		profile.history = json.dumps(history)
+		return profile	
 
 def update_distance(profile):
 	"""
