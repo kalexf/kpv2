@@ -92,7 +92,7 @@ class Profile(models.Model):
 		default=2,
 		choices=WEEKS_CHOICES,
 		)
-	
+	wtd_distance = models.DecimalField(max_digits=5,decimal_places=2,default=0.0)
 
 	
 
