@@ -266,6 +266,8 @@ class PacedRun(Activity):
 		else:
 			self.prog_value = self.PROG_CHOICES[1][0]
 			self.name = f'{self.distance} km {self.pace}'
+		if self.customname:
+			self.name = f'{self.customname}'
 		return self		
 
 	def goal_prepop(self):
@@ -317,6 +319,8 @@ class Intervals(Activity):
 		"""Sets the name field for the activity"""
 		self.my_type = self.act_type
 		self.name = f'{self.rep_number} x {self.rep_length} m Intervals'
+		if self.customname:
+			self.name = f'{self.customname}'
 		return(self)	
 	def goal_prepop(self):
 		"""returns a dictionary of values that can be used to prepopulate
@@ -380,6 +384,8 @@ class TimeTrial(Activity):
 		self.my_type = self.act_type
 		self.name = f'{self.distance}km Time Trial'
 		self.has_extra_form = True
+		if self.customname:
+			self.name = f'{self.customname}'
 		return(self)	
 
 	def goal_prepop(self):
