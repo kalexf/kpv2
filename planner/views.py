@@ -416,7 +416,7 @@ def submit(request,act_id,date_iso):
 		history.save()
 
 		# Update Activity values from Post data
-		this_act.update(request.POST)
+		this_act.update(request.POST,date_done)
 		
 		if this_act.progressive and request.POST.get('completed'):
 				this_act.progress()

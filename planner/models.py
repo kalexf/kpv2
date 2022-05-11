@@ -148,10 +148,10 @@ class Activity(models.Model):
 	def __str__(self):
 		"""return string representation of the object"""
 		return self.name
-	def update(self,post):
+	def update(self,post,date_done):
 		"""update values from submitted completion form data"""
 		self.difficulty = post.get('difficulty')
-		self.last_done = date.today()	
+		self.last_done = date_done	
 		return self
 
 

@@ -44,6 +44,9 @@ class Profile_Form(forms.ModelForm):
 		}
 		
 
+# ADD FORMS -Forms for creating new Activity instances
+# - fields vary depending on activity type
+
 class PR_Form(forms.ModelForm):
 	class Meta:
 		model = PacedRun
@@ -53,19 +56,21 @@ class PR_Form(forms.ModelForm):
 		'minutes',
 		'distance',
 		'progressive',
+		'customname',
 			]
 		labels = {
 		'prog_value':'Track time(minutes) or distance (km)?',
 		'pace':'Pace',
 		'minutes':'Length(minutes)',
 		'distance':'Length(km)',
-		'progressive':'Progressive?'
+		'progressive':'Progressive?',
+		'customname':'Use Custome name? Leave blank to use default.',
 			}
 		widgets = {
 			'prog_value':forms.RadioSelect,
 		}
 
-# Forms for creating new Activity instances- fields vary depending on activity type
+
 class Int_Form(forms.ModelForm):
 	class Meta:
 		model = Intervals
@@ -73,11 +78,14 @@ class Int_Form(forms.ModelForm):
 			'rep_length',
 			'rep_number',
 			'progressive',
+			'customname',
+		
 			]
 		labels = {
 			'rep_length':'Interval length(m)',
 			'rep_number':'Repetitions',
-			'progressive':'Progressive?'
+			'progressive':'Progressive?',
+			'customname':'Use Custome name? Leave blank to use default.',
 			}
 class TT_Form(forms.ModelForm):
 	class Meta:
@@ -85,10 +93,12 @@ class TT_Form(forms.ModelForm):
 		fields = [
 			'distance',
 			'progressive',
+			'customname',
 			]
 		labels = {
 			'distance':'Distance(km)',
-			'progressive':'Progressive?'
+			'progressive':'Progressive?',
+			'customname':'Use Custome name? Leave blank to use default.',
 			}			
 class CT_Form(forms.ModelForm):
 	class Meta:
