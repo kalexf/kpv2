@@ -69,6 +69,7 @@ WEEKS_CHOICES = [
 
 		]	
 
+
 class Profile(models.Model):
 	"""Stores information about user used to generate schedule and track
 	statistics. Any information not related to a specific activity saved here"""
@@ -123,6 +124,7 @@ class Activity(models.Model):
 		# By default returns objects with oldest first
 	# User readable description of the activity for display on home screen & schedule
 	name = models.CharField(max_length=40,default='namenlose')
+	customname = models.CharField(max_length=40,blank=True,null=True)
 	# User the activity is connected to
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
 	# Represents the total distance covered during the activity, used for tracking
