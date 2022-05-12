@@ -55,12 +55,18 @@ def view_history(request):
 	"""
 	context = {}
 	profile = get_profile(request.user)
+	if profile.history:
+		try:
+			history_list = json.loads(profile.history)
+			context['history_list'] = history_list
+		except:
+			context['message'] = 'could not load history.'
 	
-	history_list = json.loads(profile.history)
-	if not history_list:
-		context['message'] = 'No history to show yet! Please try harder.'
 	else:
-		context['history_list'] = history_list
+		context['message'] = 'No history to show yet! Please try harder.'
+
+	
+	
 	context['current_week_distance'] = f'{profile.wtd_distance} KM'
 			
 	return render(request,'planner/history.html',context)	 
