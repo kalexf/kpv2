@@ -420,30 +420,35 @@ def submit(request,act_id,date_iso):
 			if date_done < profile.current_week_initial + timedelta(days=7):
 				profile.wtd_distance += Decimal(distance)
 				profile.save()
-		# Create entry for saving to user activity history.
-		# TODO refactor to separate function
-		historyentry = {'date':date_iso}
-		if distance:
-			historyentry['distance'] = f'{distance}'
-		else:
-			historyentry['distance'] = 'n/a'	
-		if activity.name:
-			historyentry['name'] = activity.name	
-
-		# Add entry to history on profile, save.
-		if not profile.history:
-			history = []
-		else:
-			history = json.loads(profile.history)
-
-
-		history.append(historyentry)
-
-		profile.history = json.dumps(history)
-		profile.save()		
+		# Update user's history page
+		profile = update_history(profile,date_iso,distance,activity.name)
+		profile.save()
 					
 
 	return redirect('planner:home')	
+
+def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
+	# Create history entry
+	historyentry = {
+		'date':date_iso,
+		'name':name,
+		'distance':f'{distance}',
+		}
+	# Check if usr has history, if not create
+	if profile.history:
+		history = json.loads(profile.history)	
+	else: 
+		history = []
+	# Check history length and trim if necessary
+	if len(history) > 50:
+		history = history[:50]
+	# Add new entry to front of history
+	history.insert(0,historyentry)
+	profile.history = json.dumps(history)
+
+	return profile	
+
+
 
 def restdate(request,date_iso):
 	"""
