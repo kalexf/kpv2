@@ -4,9 +4,16 @@
 
 {% if history_list %}
 <table>
-  <tr><th>Week Beginning</th><th>Distance</th></tr>
+  <tr>
+    <th>Week Beginning</th>
+    <th>Name</th>
+    <th>Distance</th></tr>
     {% for entry in history_list %}
-      <tr><td>{{entry.date}}</td><td>{{entry.distance}}</td></tr>
+      <tr>
+        <td>{{entry.date}}</td>
+        <td>{{entry.name}}</td>
+        <td>{{entry.distance}}</td>
+      </tr>
     {% endfor %}
 </table>   
 

@@ -126,23 +126,7 @@ def home(request):
 	
 	return render(request,'planner/home.html', context)
 
-def save_to_history(profile):
-	"""
-	Update history field with date and distance total. 
-	Returns ammended profile without saving profile.
-	"""
-	entry = {
-	'distance':f'{profile.wtd_distance}KM' or 0,
-	'date':profile.current_week_initial.isoformat() 
-	}
-	if not profile.history:
-		profile.history = json.dumps([entry])
-		return profile
-	else:
-		history = json.loads(profile.history)
-		history.append(entry)
-		profile.history = json.dumps(history)
-		return profile	
+
 	
 
 def update_schedule(schedule_list):
@@ -413,13 +397,15 @@ def submit(request,act_id,date_iso):
 		date_done = date.fromisoformat(date_iso)
 
 
-		history = CompletedAct(
+		completedact = CompletedAct(
 			owner=request.user,
 			date_done=date_done,
 			name = this_act.name,
 			distance=distance,
 			)
-		history.save()
+		completedact.save()
+		
+
 
 		# Update Activity values from Post data
 		this_act.update(request.POST,date_done)
@@ -434,6 +420,28 @@ def submit(request,act_id,date_iso):
 			if date_done < profile.current_week_initial + timedelta(days=7):
 				profile.wtd_distance += Decimal(distance)
 				profile.save()
+		# Create entry for saving to user activity history.
+		# TODO refactor to separate function
+		historyentry = {'date':date_iso}
+		if distance:
+			historyentry['distance'] = f'{distance}'
+		else:
+			historyentry['distance'] = 'n/a'	
+		if activity.name:
+			historyentry['name'] = activity.name	
+
+		# Add entry to history on profile, save.
+		if not profile.history:
+			history = []
+		else:
+			history = json.loads(profile.history)
+
+
+		history.append(historyentry)
+
+		profile.history = json.dumps(history)
+		profile.save()		
+					
 
 	return redirect('planner:home')	
 
