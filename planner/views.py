@@ -122,16 +122,7 @@ def home(request):
 			# No plan, prompt message to create one
 			message = 'Use links below to create activities/ plan'
 			context['no_plan_message'] = message
-		# Check whether date is within current_week_initial range
-		if not profile.current_week_initial:
-			profile.current_week_initial = get_initial_date(date.today())
-		if date.today() > profile.current_week_initial + timedelta(days=6):
-			#Save history and reset date
-			profile = save_to_history(profile)
-			# Reset distance and date
-			profile.current_week_initial = get_initial_date(date.today())
-			
-			profile.save()
+		
 
 
 		activities = Activity.objects.filter(owner=request.user)
