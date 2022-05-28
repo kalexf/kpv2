@@ -84,8 +84,9 @@ class Profile(models.Model):
 		User, 
 		on_delete=models.CASCADE
 		)
-	# Python object converted to JSON which holds user's plan information
+	# User's custom plan dict, maps activity id's to week day names.
 	plan = models.JSONField(null=True,blank=True)
+	# Activity history dictionary.
 	history = models.JSONField(null=True,blank=True)
 	
 	# How many weeks the schedule will run for
@@ -93,7 +94,7 @@ class Profile(models.Model):
 		default=2,
 		choices=WEEKS_CHOICES,
 		)
-	wtd_distance = models.DecimalField(max_digits=5,decimal_places=2,default=0.0)
+	
 
 	
 
