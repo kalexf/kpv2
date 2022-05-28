@@ -22,6 +22,7 @@ urlpatterns = [
 	path('generate/',views.generate_plan,name='generate'),
 	path('settings/',views.settings,name='settings'),
 	path('history/',views.view_history,name='history'),
+	path('mileage/', views.mileage,name='mileage'),
 	]
 
-	# path('delete/',views.delete,name='delete'),
+	

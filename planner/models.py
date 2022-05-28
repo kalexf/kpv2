@@ -88,7 +88,8 @@ class Profile(models.Model):
 	plan = models.JSONField(null=True,blank=True)
 	# Activity history dictionary.
 	history = models.JSONField(null=True,blank=True)
-	
+	# Mileage history
+	mileage_history = models.JSONField(null=True,blank=True)
 	# How many weeks the schedule will run for
 	plan_length = models.PositiveSmallIntegerField(
 		default=2,

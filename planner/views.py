@@ -67,9 +67,16 @@ def view_history(request):
 
 	
 	
-	context['current_week_distance'] = f'{profile.wtd_distance} KM'
+	
 			
 	return render(request,'planner/history.html',context)	 
+
+def mileage(request):
+	"""
+	Render history of weekly distance.
+	"""
+	return render(request, 'planner/mileage_history.html',context={})
+
 
 
 def home(request):
@@ -114,14 +121,14 @@ def home(request):
 			profile = save_to_history(profile)
 			# Reset distance and date
 			profile.current_week_initial = get_initial_date(date.today())
-			profile.wtd_distance = Decimal(0.0)
+			
 			profile.save()
 
 
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
 		context['date_iso'] = date.today().isoformat()
-		context['wtd_distance'] = profile.wtd_distance
+		
 
 	
 	return render(request,'planner/home.html', context)
@@ -250,14 +257,16 @@ def get_schedule_list(profile,replace=True):
 
 def get_initial_date(t_day):
 	"""
-	Returns date object for most recent Monday(inc today). Will cause error if
-	fed something other than date object.
+	Returns date for most recent Monday(inc today). Returns 0 if
+	fed something other than a python date object.
 	"""
-	for i in range(7):
-		if t_day.strftime("%a") == 'Mon':
-			return t_day
-		t_day -= timedelta(days=1)	
-	return 0
+	try:
+		for i in range(7):
+			if t_day.strftime("%a") == 'Mon':
+				return t_day
+			t_day -= timedelta(days=1)	
+	except:
+		return 0
 
 def settings(request):
 	"""
@@ -414,18 +423,75 @@ def submit(request,act_id,date_iso):
 				this_act.progress()
 		this_act.setvalues()
 		this_act.save()
-		# If act is withing current date range, add it's distance value to wtd
+		
 		profile = get_profile(request.user)
-		if distance and profile.current_week_initial:
-			if date_done < profile.current_week_initial + timedelta(days=7):
-				profile.wtd_distance += Decimal(distance)
-				profile.save()
-		# Update user's history page
+		
+		# Update user's history
 		profile = update_history(profile,date_iso,distance,activity.name)
+		# If activity has distance value, use it to update mileage.
+		if distance:
+			profile = update_mileage(profile,date_done,distance)
+		
 		profile.save()
 					
 
 	return redirect('planner:home')	
+
+
+def update_mileage(profile,date_done,act_distance=0):
+	"""
+	Add distance value to user's mileage total and return updated profile.
+	Date done should be date object, distance should be decimal value.
+	
+	"""
+
+	# If activity has no distance value, return unmodified profile to avoid 
+	# creating empty rows
+	if not act_distance:
+		return profile
+		
+
+	# string representing week beginning		
+	week_initial_str = get_initial_date(date_done).isoformat()	
+	# Load mileage history 
+	if profile.mileage_history:
+		history = json.loads(profile.mileage_history)
+	# Else if no user mileage history yet, create initial entry.
+	else:
+		history = [
+		{
+			'date':week_initial_str,
+			'distance':'0.0'
+			}
+		]		
+	# If current week still corresponds to history[0], add distance to that 
+	# week's total.
+	if history[0]['date'] == week_initial_str:
+		wtd_distance = decimal(history[0]['distance'])
+		wtd_distance += decimal(act_distance)
+		history[0]['distance'] = f'{wtd_distance}'
+	# If current week initial date not in history, create new entry
+	else:
+		# If (somehow) saving an activity that is in the past and a new
+		# week entry has already been made, return unmodified profile.
+		# if date older than history[0], ignore
+		if (date_done - date.fromisoformat(history[0]['date'])).days < 0: 
+			return profile
+		# Else if valid, create new entry and add to front of history.
+
+		entry = {
+			'date':week_initial_str,
+			'distance':str(distance)
+		}
+		history.insert(0,entry)
+
+	#Update mileage field on history.
+	profile.mileage_history = json.dumps(history)
+
+	return profile		
+
+
+
 
 def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
 	# Create history entry
