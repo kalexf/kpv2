@@ -75,7 +75,16 @@ def mileage(request):
 	"""
 	Render history of weekly distance.
 	"""
-	return render(request, 'planner/mileage_history.html',context={})
+	context={}
+	profile=get_profile(request.user)
+	if profile.mileage_history:
+		history_list = json.loads(profile.mileage_history)
+		context['history_list']=history_list
+	else:
+		context['message']='No mileage history yet, complete some activities.'	
+	
+
+	return render(request, 'planner/mileage_history.html',context)
 
 
 
@@ -467,8 +476,8 @@ def update_mileage(profile,date_done,act_distance=0):
 	# If current week still corresponds to history[0], add distance to that 
 	# week's total.
 	if history[0]['date'] == week_initial_str:
-		wtd_distance = decimal(history[0]['distance'])
-		wtd_distance += decimal(act_distance)
+		wtd_distance = Decimal(history[0]['distance'])
+		wtd_distance += Decimal(act_distance)
 		history[0]['distance'] = f'{wtd_distance}'
 	# If current week initial date not in history, create new entry
 	else:
