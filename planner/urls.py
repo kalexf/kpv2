@@ -5,7 +5,6 @@ from . import views
 
 app_name = 'planner'
 urlpatterns = [
-	path('tests/',views.testview,name='testing'),
 	path('',views.home,name='home'),
 	path('addnew/',views.add_new,name='addnew'),
 	path('addnew/<str:act_type>/',views.add_new,name='addnew'),

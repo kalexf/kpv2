@@ -345,17 +345,20 @@ class TimeTrial(Activity):
 	# Number of seconds to be taken off time each time exercise done.
 	prog_time = models.PositiveSmallIntegerField(blank=True,null=True)
 	
-	def update(self,post):
-		super().update(post)
-		# If minutes and/or seconds values given on form, calculate new time value.
-		
+
+	def update(self,post,date_done):
+		"""update values from submitted completion form data"""
+		self.difficulty = post.get('difficulty')
+		self.last_done = date_done	
 		minutes = post.get('minutes')
 		seconds = post.get('seconds')
 		if minutes:
 			self.time = int(minutes) * 60
 		if seconds:
 			self.time += int(seconds)	
-	
+		
+		return self
+
 	def progress(self):
 		if self.time:
 			self.time -= self.prog_time
