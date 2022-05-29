@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from datetime import date, timedelta, datetime
 import json
 from decimal import Decimal
@@ -9,7 +10,6 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
 	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
 	Profile_Form, PlanForm )
-
 
 
 # List of all activity models.
@@ -140,9 +140,7 @@ def add_new(request,act_type=''):
 					'act_id':act_id,'act_type':act_type
 					}
 				return render(request,'planner/setgoal.html',context)
-
 		return redirect('planner:home')	
-
 	else:	
 		# request from link, provide appropriate form for new activity.
 		context = {'ACT_LIST':ACT_LIST}
@@ -152,7 +150,6 @@ def add_new(request,act_type=''):
 			add_form = 	ADD_FORMS[act_type]
 			context['add_form'] = add_form
 			context['act_type'] = act_type
-
 		return render(request,'planner/addnew.html', context)
 
 
@@ -204,25 +201,32 @@ def settings(request):
 @login_required
 def submit(request,act_id,date_iso):
 	"""Serve page where user can submit details of completed activity"""
-	# Get activity
-	
+	# Serving form to edit activity.
 	if request.method != 'POST':
-		
-		activity = get_act(act_id)	
+		# Get activity
+		activity = get_act(act_id)
+		if not activity or (activity.owner != request.user):
+			# Get request has invalid id or id does no bleong to user.
+			raise Http404 	
+		# Prepopulate form for editing.
 		form = SUB_FORMS[activity.my_type]
 		context = {
-		'activity':activity,
-		'form':form,
-		'date_iso':date_iso,
-		}
+			'activity':activity,
+			'form':form,
+			'date_iso':date_iso,
+			}
 		return render(request, 'planner/submit.html',context)
 
+	# Handling submitted form.
 	elif request.method == 'POST':
-		# Gets iD from hidden form field 
 		activity = get_act(request.POST.get('act_id'))
+		# Check ownership (shouldn't actually be needed)
+		if activity.owner != request.user:
+			raise Http404
 		model = get_model(activity.my_type)
+		# Get instance.
 		this_act = model.objects.get(id=act_id)
-		# create CompletedAct entry.  
+		# create CompletedAct instance.  
 		distance = this_act.distance or 0
 		date_done = date.fromisoformat(date_iso)
 		completedact = CompletedAct(
@@ -292,12 +296,20 @@ def generate_plan(request):
 @login_required
 def edit(request,act_id=None):
 	"""edit the details of an activity"""
-	# REFACTORING
-	if request.method == 'POST':
+	# Get activity instance.
+	if not act_id:
 		act_id = request.POST.get('act_id')
-		activity = get_act(act_id)
-		model = get_model(activity.my_type)
-		this_act = model.objects.get(id=act_id)
+	activity = get_act(act_id)
+	if not activity:
+		raise Http404
+	else:
+	# Check ownership.
+		if activity.owner != request.user:
+			raise Http404			
+	model = get_model(activity.my_type)
+	this_act = model.objects.get(id=act_id)
+	# Save Form		
+	if request.method == 'POST':
 		form = ADD_FORMS[model.act_type](instance=this_act,data=request.POST)
 		if form.is_valid():
 			form.save()
@@ -307,11 +319,12 @@ def edit(request,act_id=None):
 		this_act.save()
 		return redirect('planner:home')		
 	# Get appropriate form and populate it	
-	activity = get_act(act_id)
-	model = get_model(activity.my_type)
-	this_act = model.objects.get(id=act_id)
 	form = ADD_FORMS[model.act_type](instance=this_act)
-	context = {'form':form,'name':activity.name,'act_id':act_id}
+	context = {
+	'form':form,
+	'name':activity.name,
+	'act_id':act_id
+	}
 	# If activity is progressive, get and populate progression form.
 	if activity.progressive:
 		prog_form = GOAL_FORMS[activity.my_type]
@@ -323,15 +336,19 @@ def edit(request,act_id=None):
 @login_required
 def delete(request, act_id=None):
 	"""For deleting activities"""
-	## TODO ADD OWNERSHIP CHECK
+	if not act_id:
+		act_id = request.POST.get('act_id')
+	activity = get_act(act_id)
+	# Check that activity exists and belongs to user.
+	if not activity:
+		raise Http404
+	if activity.owner != request.user:
+		raise Http404	
 	if request.method != 'POST':
 		# From link - serve confirmation form
-		activity = get_act(act_id)
 		context = {'activity':activity}
 		return render(request,'planner/delete.html',context)
 	if request.method == 'POST':	
-		act_id = int(request.POST.get('act_id'))
-		activity = get_act(act_id)
 		activity.delete()		
 		return redirect('planner:home')
 
@@ -368,8 +385,6 @@ def setgoal(request):
 
 
 ### HELPERS ###
-
-
 def update_schedule(schedule_list):
 	"""
 	returns days that need updating, or 0 if there are none
@@ -488,7 +503,6 @@ def update_mileage(profile,date_done,act_distance=0):
 		history = history[:49]	
 	#Update mileage field on history.
 	profile.mileage_history = json.dumps(history)
-
 	return profile		
 
 
@@ -510,14 +524,13 @@ def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
 	# Add new entry to front of history
 	history.insert(0,historyentry)
 	profile.history = json.dumps(history)
-
 	return profile	
 
 
 def get_profile(user):
 	"""
-	Return profile object for user, if none found inits one. If not logged in
-	returns 0 
+	Return profile object for user, if none found initialises one. 
+	If not logged in returns 0 .
 	"""
 	if user.is_authenticated:
 		try:
@@ -525,7 +538,6 @@ def get_profile(user):
 		except:
 			profile = Profile(owner=user)
 			profile.save()	
-
 		return profile
 	else:
 		return 0	 
