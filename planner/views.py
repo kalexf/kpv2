@@ -59,47 +59,43 @@ def home(request):
 	"""
 	# Declare context dictionary
 	context = {}
-	# Generate home screen if user is logged in, if not prompt to login /register
+	# Generate home screen if user logged in, if not prompt to login /register
 	if request.user.is_authenticated:
 		# Get User profile
 		profile = get_profile(request.user)
-		# If user has a saved plan, build schedule schedule.
+		# If user has a saved plan, generate schedule.
 		if profile.plan:
 			schedule_list = get_schedule_list(profile)
-			# Check if schedule list has uncompleted parts, if it does redirect 
-			# to confirmation screen to update
+			# Check if schedule list has uncompleted activities, if it does 
+			# redirect to update view.
 			update_list = update_schedule(schedule_list)
-			
 			if update_list:
 				return render(
 					request,
 					'planner/update.html',
 					context={'update_list':update_list},
 					)		
-
-			# Add past tag to any completed non-rest days
+			# Add 'past' attribute to any completed non-rest days.
 			for day in schedule_list:
 				if day.name != rest_string and day.complete == True:
 					day.past = True
+			# Add updated schedule to context dict.
 			context['schedule_list'] = schedule_list
 		
-		# Get user's activities for home screen list
 		else:
 			# No plan, prompt message to create one
 			message = 'Use links below to create activities/ plan'
 			context['no_plan_message'] = message
 		
+		# Get list of user's activities for home screen.
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
-		context['date_iso'] = date.today().isoformat()
-		
-	
 	return render(request,'planner/home.html', context)
 
 
 def view_history(request):
 	"""
-	render page showing table of weekly distance
+	Render page showing table of weekly distance totals.
 	"""
 	context = {}
 	profile = get_profile(request.user)
@@ -108,47 +104,41 @@ def view_history(request):
 			history_list = json.loads(profile.history)
 			context['history_list'] = history_list
 		except:
-			context['message'] = 'could not load history.'
+			context['message'] = 'Error loading history.'
 	
 	else:
 		context['message'] = 'No history to show yet! Please try harder.'
 					
 	return render(request,'planner/history.html',context)	 
 
+
 def add_new(request,act_type=''):
-	"""display form for creation of new activity types"""
+	"""Display form for creation of new activity types."""
 	
 	if request.method == "POST":
-		# POST request - save new activty from submitted form
+		# POST request; save new activty from submitted form
 		act_type = request.POST.get('act_type')
 		form = ADD_FORMS[act_type](data=request.POST)
-		
 		if form.is_valid():
 			new_activity = form.save(commit=False)
 			new_activity.owner = request.user
 			new_activity.setvalues()
 			new_activity.save()
-
-
+			# If new activity is progressive, render view for setting goals.
 			if new_activity.progressive:
-
 				goal_form = GOAL_FORMS[act_type]
-
 				act_id = new_activity.id
-
-				context = {'goal_form':goal_form,'act_id':act_id,'act_type':act_type}
+				context = {
+					'goal_form':goal_form,
+					'act_id':act_id,'act_type':act_type
+					}
 				return render(request,'planner/setgoal.html',context)
-
-		else:
-			# invalid form
-			pass
 
 		return redirect('planner:home')	
 
 	else:	
-		# request from link, provide appropriate menu / blank form for new activity creation
+		# request from link, provide appropriate form for new activity.
 		context = {'ACT_LIST':ACT_LIST}
-
 		# If user clicked on link to create specific activity type,
 		# serve form for creation of that.
 		if act_type:
@@ -157,6 +147,7 @@ def add_new(request,act_type=''):
 			context['act_type'] = act_type
 
 		return render(request,'planner/addnew.html', context)
+
 
 def mileage(request):
 	"""
@@ -170,9 +161,9 @@ def mileage(request):
 	else:
 		context['message']='No mileage history yet, complete some activities.'	
 	
-
 	return render(request, 'planner/mileage_history.html',context)
 	
+
 def settings(request):
 	"""
 	Renders edit user preferences page.
@@ -181,10 +172,8 @@ def settings(request):
 	profile = get_profile(request.user)
 	
 	if request.method != 'POST':
-
 		form = Profile_Form(instance=profile)
 		context = {'form':form}
-
 		return render(request,'planner/profilesettings.html',context)
 
 	else:
@@ -217,18 +206,14 @@ def submit(request,act_id,date_iso):
 		}
 		return render(request, 'planner/submit.html',context)
 
-
 	elif request.method == 'POST':
 		# Gets iD from hidden form field 
 		activity = get_act(request.POST.get('act_id'))
 		model = get_model(activity.my_type)
 		this_act = model.objects.get(id=act_id)
-		# create CompletedAct entry. Created / saved before progression to get
-		# accurate values for activity name. 
+		# create CompletedAct entry.  
 		distance = this_act.distance or 0
 		date_done = date.fromisoformat(date_iso)
-
-
 		completedact = CompletedAct(
 			owner=request.user,
 			date_done=date_done,
@@ -236,20 +221,14 @@ def submit(request,act_id,date_iso):
 			distance=distance,
 			)
 		completedact.save()
-		
-
-
 		# Update Activity values from Post data
 		this_act.update(request.POST,date_done)
-		
 		if this_act.progressive and request.POST.get('completed'):
 				this_act.progress()
 		this_act.setvalues()
 		this_act.save()
-		
-		profile = get_profile(request.user)
-		
 		# Update user's history
+		profile = get_profile(request.user)
 		profile = update_history(profile,date_iso,distance,activity.name)
 		# If activity has distance value, use it to update mileage.
 		if distance:
@@ -257,22 +236,20 @@ def submit(request,act_id,date_iso):
 		# Delete any completed acts that are no longer needed
 		clean_completed_acts(request.user,29)
 		
-		profile.save()
-					
-
+		profile.save()				
 	return redirect('planner:home')	
 		
 
 def generate_plan(request):
 	"""
-	Returns Screen where user can build new plan, saves submitted plan
-	to user profile.
+	Returns page for setting new plan, saves submitted plan to profile.
 	"""
 	context ={}
 	profile = get_profile(request.user)
 	weeks = profile.plan_length
 	choices = get_plan_choices(request.user)
 	if len(choices) == 1:
+		# If length is == 1, list contains only default 'rest day' option.
 		message = "You need to create some activities before making a plan"
 		context['message'] = message
 	# initial dictionary is used to pre-populate the plan form with user's 
@@ -283,31 +260,25 @@ def generate_plan(request):
 		initial_dict = {}
 	# Generate custom form with correct number of fields, choices.	
 	form = PlanForm(weeks,choices,initial_dict)
-
-	
 	if request.method == 'POST':
 		#check and save form
-		
 		form = PlanForm(weeks,choices,request.POST)
 		plan_dict = request.POST.dict()
 		# Remove unnecessary fields.
 		plan_dict.pop('csrfmiddlewaretoken')
 		plan_dict.pop('submit')	
-		# Save submitted plan to JSON field.
+		# Save submitted plan to JSON field on profile.
 		profile.plan = json.dumps(plan_dict)
 		profile.save()
-		return redirect('planner:home')
-			
+		return redirect('planner:home')		
 	context['form'] = form
 	day_list = get_lists(weeks)
 	context.update(day_list)
-	
 	return render(request,'planner/plan.html',context)
 
 def edit(request,act_id=None):
 	"""edit the details of an activity"""
 	# REFACTORING
-
 	if request.method == 'POST':
 		act_id = request.POST.get('act_id')
 		activity = get_act(act_id)
@@ -320,55 +291,42 @@ def edit(request,act_id=None):
 		if this_act.progressive:
 			this_act.setgoals(request.POST)	
 		this_act.save()
-		return redirect('planner:home')	
-
-		#	SAVE CHANGES 
-
-	# Get appropriate form and populate it
-	
-
+		return redirect('planner:home')		
+	# Get appropriate form and populate it	
 	activity = get_act(act_id)
 	model = get_model(activity.my_type)
 	this_act = model.objects.get(id=act_id)
 	form = ADD_FORMS[model.act_type](instance=this_act)
 	context = {'form':form,'name':activity.name,'act_id':act_id}
-	
-	# If activity is progressive, get and populate appropriate progression form
+	# If activity is progressive, get and populate progression form.
 	if activity.progressive:
 		prog_form = GOAL_FORMS[activity.my_type]
-
 		prog_form = prog_form(this_act.goal_prepop())
 		context['prog_form'] = prog_form	
-	
-	
 	return render(request,'planner/edit.html',context)
+
 
 def delete(request, act_id=None):
 	"""For deleting activities"""
-
-	## ! TODO add ownership check / protection
+	## TODO ADD OWNERSHIP CHECK
 	if request.method != 'POST':
 		# From link - serve confirmation form
 		activity = get_act(act_id)
 		context = {'activity':activity}
 		return render(request,'planner/delete.html',context)
-	
-	if request.method == 'POST':
-		
+	if request.method == 'POST':	
 		act_id = int(request.POST.get('act_id'))
 		activity = get_act(act_id)
 		activity.delete()		
-
 		return redirect('planner:home')
+
 
 def restdate(request,date_iso):
 	"""
 	Creates a rest day with the given date.
 	"""
 	# Create and save a completed act object with no associated act / distance.
-	date_done = date.fromisoformat(date_iso)
-
-	
+	date_done = date.fromisoformat(date_iso)	
 	history = CompletedAct(
 		owner=request.user,
 		date_done=date_done,
@@ -378,27 +336,22 @@ def restdate(request,date_iso):
 	history.save()
 	return redirect('planner:home')	
 
+
 def setgoal(request):
 	"""Saves values returned from set goal forms when editing or creating"""
-	
 	# get activity type
 	model = get_model(request.POST.get('act_type'))
 	# Get activity being altered.
 	act_id = request.POST.get('act_id')
 	activity = model.objects.get(id=act_id)
-	
-	
 	# Give the values to activity and have it update itself
 	activity.setgoals(request.POST)
-	activity.save()
-	# TODO - save
-
-
+	activity.save()	
 	return redirect('planner:home')
 
 
-
 ### HELPERS ###
+
 
 def update_schedule(schedule_list):
 	"""
@@ -415,8 +368,6 @@ def update_schedule(schedule_list):
 	if update_list:
 		return update_list
 	return 0
-
-
 					
 
 def get_initial_date(t_day):
@@ -441,25 +392,19 @@ def get_plan_choices(user):
 	choices = [('REST',rest_string)]
 	activities = Activity.objects.filter(owner=user)
 	for act in activities:
-		
 		choices.append((act.id,act.name))
 	return choices	
-
 
 
 def get_lists(weeks):
 	"""
 	Returns dict containing n=weeks lists of weekdays values, 'week_n' keys 
 	"""
-
 	days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun',]
 	day_dict = {}
 	for i in range(weeks):
 		day_dict[f'Week_{i+1}'] = days 
-
 	return day_dict	
-
-
 
 
 def clean_completed_acts(user_id,days):
@@ -477,21 +422,16 @@ def clean_completed_acts(user_id,days):
 		return 0 	
 
 
-
-
 def update_mileage(profile,date_done,act_distance=0):
 	"""
 	Add distance value to user's mileage total and return updated profile.
 	date_done should be date object, act_distance should be decimal.
 	
 	"""
-
 	# If activity has no distance value, return unmodified profile to avoid 
 	# creating empty rows
 	if not act_distance:
 		return profile
-		
-
 	# string representing week beginning		
 	week_initial_str = get_initial_date(date_done).isoformat()	
 	# Load mileage history 
@@ -557,8 +497,6 @@ def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
 	return profile	
 
 
-
-
 def get_profile(user):
 	"""
 	Return profile object for user, if none found inits one. If not logged in
@@ -576,15 +514,12 @@ def get_profile(user):
 		return 0	 
 
 
-
-
 def get_model(act_type):
 	"""accepts an activity type and returns the corresponding model"""
 	for model in ACT_TYPES:
 		if model.act_type == act_type:
 			return model
 	return 0 		
-
 
 
 def get_act(act_id):
@@ -594,6 +529,7 @@ def get_act(act_id):
 		return Activity.objects.get(id=act_id)
 	except:
 		return 0	
+
 
 class Day:
 	"""
@@ -610,6 +546,7 @@ class Day:
 		# Added to fix a bug where schedule spanned new year
 		self.date_iso = day_date.isoformat()
 
+
 def get_schedule_list(profile,replace=True):
 	"""
 	Creates a list of 14 'day' objects, based on user's plan. Used on home
@@ -618,11 +555,9 @@ def get_schedule_list(profile,replace=True):
 	dates overlap the scheduled activity will be replaced with the completed
 	activity.
 	"""
-
 	# Check how many days have passed since the initial date of current schedule
 	if not profile.schedule_init_date:
 		profile.schedule_init_date = get_initial_date(date.today())
-
 	date_diff = date.today() - profile.schedule_init_date
 	if date_diff.days >= 7:
 		# At least one week has passed, reset schedule initial date.
@@ -630,10 +565,8 @@ def get_schedule_list(profile,replace=True):
 		profile.schedule_init_date = get_initial_date(date.today())
 		if profile.schedule_week >= profile.plan_length:
 			# Passed end of plan, reset to week 0
-
 			profile.schedule_week = 0 
 		profile.save()
-
 	# Load user's activity pattern 'plan'.
 	plan = json.loads(profile.plan)
 	# Create empty schedule list with correct dates, names all 'rest' 
@@ -641,19 +574,16 @@ def get_schedule_list(profile,replace=True):
 	start_date = profile.schedule_init_date
 	for i in range(14):
 		day = Day(start_date+timedelta(days=i),rest_string)
-		sch_list.append(day)
-	
+		sch_list.append(day)	
 	# Plan_days = List of integers, represents which days from user's plan will 
 	# be used to create current schedule instance.
 	plan_days = [1,2,3,4,5,6,7,1,2,3,4,5,6,7]
 	# 1 Week plan will always use this 14-day schedule format,longer plans 
 	# will vary depending on which week of schedule user is on.
-	
 	a = [1,2,3,4,5,6,7]
 	b = [8,9,10,11,12,13,14]
 	c = [15,16,17,18,19,20,21]
 	d = [22,23,24,25,26,27,28]
-
 	if profile.plan_length != 1:
 		week = profile.schedule_week
 		# Combine number lists to make correct list of plan days, according to
@@ -668,11 +598,9 @@ def get_schedule_list(profile,replace=True):
 		if week == 2:
 			plan_days = c + d
 		if week == 3:
-			plan_days = d + a		 
-		
+			plan_days = d + a		 	
 	# Create schedule list object, copying plan activities to correct position
 	# in schedule.
-
 	for i in range(14):
 		day_value = plan[f'day_{plan_days[i]}']
 		if day_value != 'REST':
@@ -680,7 +608,6 @@ def get_schedule_list(profile,replace=True):
 			if activity:
 				sch_list[i].name = activity.name
 				sch_list[i].act_id = day_value
-	
 	if replace == True:
 		# Look up user's completed activities
 		past_acts = CompletedAct.objects.filter(owner=profile.owner)
@@ -695,5 +622,4 @@ def get_schedule_list(profile,replace=True):
 					if past_act.date_done == date.today():
 						day.name = past_act.name
 						day.complete = True		
-
 	return sch_list
