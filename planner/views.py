@@ -48,6 +48,8 @@ SUB_FORMS = {
 	}
 # Used with date.strptime, strftime.
 dateFormat = "%a %d %b"
+# Used to represent rest days
+rest_string = "Rest Day"
 
 def view_history(request):
 	"""
@@ -117,7 +119,7 @@ def home(request):
 
 			# Remove 'completed' attribute from any past rest days in schedule.
 			for day in schedule_list:
-				if day.name == 'Rest Day':
+				if day.name == rest_string:
 					day.completed = False
 			context['schedule_list'] = schedule_list
 		
@@ -150,7 +152,7 @@ def update_schedule(schedule_list):
 		if day.date_str == 'Today':
 			break
 		# Add any that are incomplete And not rest days to list.
-		if not day.complete and day.name != 'Rest Day':
+		if not day.complete and day.name != rest_string:
 			update_list.append(day)
 	if update_list:
 		return update_list
@@ -160,12 +162,13 @@ class Day:
 	"""
 	For constructing schedule list used on home page
 	"""
-	def __init__(self,day_date,name='Rest Day'):
+	def __init__(self,day_date,name=rest_string):
 		self.date_str = day_date.strftime(dateFormat)
 		if day_date == date.today():
 			self.date_str = 'Today'
 		self.name = name
 		self.complete = False
+		self.past = False
 		self.act_id = 0
 		# Added to fix a bug where schedule spanned new year
 		self.date_iso = day_date.isoformat()
@@ -200,7 +203,7 @@ def get_schedule_list(profile,replace=True):
 	sch_list = []
 	start_date = profile.schedule_init_date
 	for i in range(14):
-		day = Day(start_date+timedelta(days=i),'Rest Day')
+		day = Day(start_date+timedelta(days=i),rest_string)
 		sch_list.append(day)
 	
 	# Plan_days = List of integers, represents which days from user's plan will 
@@ -353,7 +356,7 @@ def get_plan_choices(user):
 	Returns list of 2-tuples to use as choices field on plan creation form.
 	The first default item is always a rest day
 	"""
-	choices = [('REST','Rest Day')]
+	choices = [('REST',rest_string)]
 	activities = Activity.objects.filter(owner=user)
 	for act in activities:
 		
@@ -445,15 +448,17 @@ def submit(request,act_id,date_iso):
 
 def clean_completed_acts(user_id,days):
 	"""
-	delete any of user's completed_acts that older than specified days. Takes
+	delete any of user's completed_acts older than specified days. Takes
 	user_id and number of days to be used as deletion criteria.
 	"""
-	
-	user_comp_acts = CompletedAct.objects.filter(owner=user_id)
-	for act in user_comp_acts:
-		if (date.today() - act.date_done).days >= days:
-			act.delete()
-	return 1	
+	try:
+		user_comp_acts = CompletedAct.objects.filter(owner=user_id)
+		for act in user_comp_acts:
+			if (date.today() - act.date_done).days >= days:
+				act.delete()
+		return 1	
+	except:
+		return 0 	
 
 
 
@@ -461,7 +466,7 @@ def clean_completed_acts(user_id,days):
 def update_mileage(profile,date_done,act_distance=0):
 	"""
 	Add distance value to user's mileage total and return updated profile.
-	Date done should be date object, distance should be decimal value.
+	date_done should be date object, act_distance should be decimal.
 	
 	"""
 
@@ -505,7 +510,7 @@ def update_mileage(profile,date_done,act_distance=0):
 		}
 		history.insert(0,entry)
 
-	# Check history length and trim if necessary
+	# Check history length and trim oldest if necessary
 	if len(history) > 50:
 		history = history[:49]	
 	#Update mileage field on history.
@@ -528,7 +533,7 @@ def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
 		history = json.loads(profile.history)	
 	else: 
 		history = []
-	# Check history length and trim if necessary
+	# Check history length and trim oldest if necessary
 	if len(history) > 50:
 		history = history[:49]
 	# Add new entry to front of history
@@ -550,7 +555,7 @@ def restdate(request,date_iso):
 	history = CompletedAct(
 		owner=request.user,
 		date_done=date_done,
-		name='Rest Day',
+		name=rest_string,
 		distance=0.0
 		)
 	history.save()

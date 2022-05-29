@@ -24,7 +24,7 @@
               <tr>
                 {% for day in schedule_list|slice:":7" %}
                 <td>
-                    {% if day.complete %}
+                    {% if day.past %}
                       Completed
                     {% endif %}  
                 </td>
