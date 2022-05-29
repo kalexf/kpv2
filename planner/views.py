@@ -379,13 +379,6 @@ def get_lists(weeks):
 
 
 
-def testview(request):
-	"""for testing"""
-	
-
-
-	return render(request,'planner/testtemplate.html')
-
 def submit(request,act_id,date_iso):
 	"""Serve page where user can submit details of completed activity"""
 	# Get activity
