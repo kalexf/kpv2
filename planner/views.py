@@ -505,6 +505,9 @@ def update_mileage(profile,date_done,act_distance=0):
 		}
 		history.insert(0,entry)
 
+	# Check history length and trim if necessary
+	if len(history) > 50:
+		history = history[:49]	
 	#Update mileage field on history.
 	profile.mileage_history = json.dumps(history)
 
@@ -527,7 +530,7 @@ def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
 		history = []
 	# Check history length and trim if necessary
 	if len(history) > 50:
-		history = history[:50]
+		history = history[:49]
 	# Add new entry to front of history
 	history.insert(0,historyentry)
 	profile.history = json.dumps(history)
