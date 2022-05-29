@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from datetime import date, timedelta, datetime
 import json
 from decimal import Decimal
@@ -90,9 +91,14 @@ def home(request):
 		# Get list of user's activities for home screen.
 		activities = Activity.objects.filter(owner=request.user)
 		context['activities'] = activities
+		# Add string representing today's date to context dictionary,
+		# used when submitting activity from activity table.
+		context['date_iso'] = date.today().isoformat()
+	
 	return render(request,'planner/home.html', context)
 
 
+@login_required
 def view_history(request):
 	"""
 	Render page showing table of weekly distance totals.
@@ -112,6 +118,7 @@ def view_history(request):
 	return render(request,'planner/history.html',context)	 
 
 
+@login_required
 def add_new(request,act_type=''):
 	"""Display form for creation of new activity types."""
 	
@@ -149,6 +156,7 @@ def add_new(request,act_type=''):
 		return render(request,'planner/addnew.html', context)
 
 
+@login_required
 def mileage(request):
 	"""
 	Render history of weekly distance.
@@ -164,6 +172,7 @@ def mileage(request):
 	return render(request, 'planner/mileage_history.html',context)
 	
 
+@login_required
 def settings(request):
 	"""
 	Renders edit user preferences page.
@@ -191,6 +200,8 @@ def settings(request):
 		
 		return redirect('planner:home')
 
+
+@login_required
 def submit(request,act_id,date_iso):
 	"""Serve page where user can submit details of completed activity"""
 	# Get activity
@@ -240,6 +251,7 @@ def submit(request,act_id,date_iso):
 	return redirect('planner:home')	
 		
 
+@login_required
 def generate_plan(request):
 	"""
 	Returns page for setting new plan, saves submitted plan to profile.
@@ -276,6 +288,8 @@ def generate_plan(request):
 	context.update(day_list)
 	return render(request,'planner/plan.html',context)
 
+
+@login_required
 def edit(request,act_id=None):
 	"""edit the details of an activity"""
 	# REFACTORING
@@ -306,6 +320,7 @@ def edit(request,act_id=None):
 	return render(request,'planner/edit.html',context)
 
 
+@login_required
 def delete(request, act_id=None):
 	"""For deleting activities"""
 	## TODO ADD OWNERSHIP CHECK
@@ -321,6 +336,7 @@ def delete(request, act_id=None):
 		return redirect('planner:home')
 
 
+@login_required
 def restdate(request,date_iso):
 	"""
 	Creates a rest day with the given date.
@@ -337,6 +353,7 @@ def restdate(request,date_iso):
 	return redirect('planner:home')	
 
 
+@login_required
 def setgoal(request):
 	"""Saves values returned from set goal forms when editing or creating"""
 	# get activity type
