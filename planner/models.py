@@ -76,7 +76,7 @@ class Profile(models.Model):
 	
 	# Used to track date which corresponds to first day of shchedule where
 	# sch_length > 1. 
-	schedule_init_date = models.DateField(null=True)
+	schedule_init_date = models.DateField(null=True,blank=True)
 	schedule_week = models.PositiveSmallIntegerField(default=0)
 	owner = models.ForeignKey(
 		User, 
@@ -105,7 +105,7 @@ class CompletedAct(models.Model):
 		ordering = ['date_done']
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)	
 	date_done = models.DateField(null=True)
-	name = models.CharField(max_length=40,default='namenlose')
+	name = models.CharField(max_length=40,default='nameless')
 	distance = models.DecimalField(
 		max_digits=5,
 		decimal_places=2,
@@ -123,7 +123,7 @@ class Activity(models.Model):
 		ordering = ['last_done']
 		# By default returns objects with oldest first
 	# User readable description of the activity for display on home screen & schedule
-	name = models.CharField(max_length=40,default='namenlose')
+	name = models.CharField(max_length=40,default='nameless')
 	customname = models.CharField(max_length=40,blank=True,null=True)
 	# User the activity is connected to
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)

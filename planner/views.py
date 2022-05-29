@@ -115,6 +115,10 @@ def home(request):
 					context={'update_list':update_list},
 					)		
 
+			# Remove 'completed' attribute from any past rest days in schedule.
+			for day in schedule_list:
+				if day.name == 'Rest Day':
+					day.completed = False
 			context['schedule_list'] = schedule_list
 		
 		# Get user's activities for home screen list
@@ -431,11 +435,27 @@ def submit(request,act_id,date_iso):
 		# If activity has distance value, use it to update mileage.
 		if distance:
 			profile = update_mileage(profile,date_done,distance)
+		# Delete any completed acts that are no longer needed
+		clean_completed_acts(request.user,29)
 		
 		profile.save()
 					
 
 	return redirect('planner:home')	
+
+def clean_completed_acts(user_id,days):
+	"""
+	delete any of user's completed_acts that older than specified days. Takes
+	user_id and number of days to be used as deletion criteria.
+	"""
+	
+	user_comp_acts = CompletedAct.objects.filter(owner=user_id)
+	for act in user_comp_acts:
+		if (date.today() - act.date_done).days >= days:
+			act.delete()
+	return 1	
+
+
 
 
 def update_mileage(profile,date_done,act_distance=0):
