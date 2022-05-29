@@ -117,10 +117,10 @@ def home(request):
 					context={'update_list':update_list},
 					)		
 
-			# Remove 'completed' attribute from any past rest days in schedule.
+			# Add past tag to any completed non-rest days
 			for day in schedule_list:
-				if day.name == rest_string:
-					day.completed = False
+				if day.name != rest_string and day.complete == True:
+					day.past = True
 			context['schedule_list'] = schedule_list
 		
 		# Get user's activities for home screen list
