@@ -506,13 +506,16 @@ def update_mileage(profile,date_done,act_distance=0):
 	return profile		
 
 
-def update_history(profile,date_iso='n/a',distance='n/a',name='n/a'):
+def update_history(profile,date_iso,distance,name):
 	# Create history entry
+	if not distance:
+		distance = 'n/a'
 	historyentry = {
 		'date':date_iso,
 		'name':name,
 		'distance':f'{distance}',
 		}
+	
 	# Check if usr has history, if not create
 	if profile.history:
 		history = json.loads(profile.history)	

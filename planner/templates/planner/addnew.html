@@ -1,7 +1,11 @@
 <!-- page for creation of new activity instance -->
 
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
 
+{% block page_header %}
+  <h1>Create new training activity</h1>
+{% endblock page_header %}  
 {% block content %}
 <!-- Change this to table -->
 
@@ -18,14 +22,15 @@
   {% endfor %}
 </table>
 {% if add_form %}
-  <form method="post" action="{% url 'planner:addnew' %}">
+  <form method="post" action="{% url 'planner:addnew' %}" class="form">
     {% csrf_token %}
 
-    {{add_form.as_p}}
+    {% bootstrap_form add_form %}
 
     <!-- hidden input containing activity type so addnew view knows which form type to save -->
   <input type="hidden", name="act_type", value="{{act_type}}"> 
-
-  <button name="submit"> Create new {{act_type}}</button>  
+  {% buttons %}
+    <button name="submit" class="btn btn-primary"> Create new {{act_type}}</button>  
+  {% endbuttons %}
 {% endif %}  
 {% endblock content %}

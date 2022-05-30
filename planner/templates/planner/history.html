@@ -1,19 +1,29 @@
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h4>Activity History</h4>
+{% endblock page_header %}
 
 {% block content %}
 
 {% if history_list %}
-<table>
-  <tr>
-    <th>Date</th>
-    <th>Name</th>
-    <th>Distance</th></tr>
+<table class="table table-bordered table-sm">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Name</th>
+      <th scope="col">Distance</th>
+    </tr>
+  </thead>
+  <tbody>  
     {% for entry in history_list %}
       <tr>
         <td>{{entry.date}}</td>
         <td>{{entry.name}}</td>
-        <td>{{entry.distance}}</td>
+        <td>{% if entry.distance %}{{entry.distance}}{% endif %}</td>
       </tr>
+  </tbody>    
     {% endfor %}
 </table>   
 

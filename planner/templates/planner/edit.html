@@ -1,13 +1,21 @@
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h4> Edit details for '{{name}}'</h4>
+{% endblock page_header %}
+
 {% block content %}
-<h4> Edit details for '{{name}}'</h4>
-<form action="{% url 'planner:edit' 0 %}" method ="post">
-  {{form.as_p}}
+<form action="{% url 'planner:edit' 0 %}" method ="post" class="form">
   {% csrf_token %}
+  {% bootstrap_form form %}
   {% if prog_form %}
     <h4>Set goal values for activity</h4>
-    {{prog_form.as_p}}
-   {% endif %}
+    {% bootstrap_form form %}
+  {% endif %}
    <input type="hidden" name="act_id" value={{act_id}}>
-   <button name="submit">Submit changes</button> 
+  {% buttons %} 
+   <button name="submit" class="btn btn-primary">Submit changes</button> 
+  {% endbuttons %} 
+</form>
 {% endblock content %}
