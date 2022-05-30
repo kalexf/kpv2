@@ -4,15 +4,15 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile)
 from .models import DIFF_CHOICES, WEEKS_CHOICES
 
-
+### FORMS ###
 
 
 
 class PlanForm(forms.Form):
 	"""
 	Dynamic form used for training plan creation page.
-	On init needs to be given integer 'weeks' which is used to determine
-	number of fields, and list of 2-tuples 'choices', which is used to create
+	On initialisation needs to be given integer 'weeks', 
+	and list of 2-tuples 'choices', which is used to create
 	select menus for each field. 
 	"""
 

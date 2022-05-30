@@ -1,14 +1,18 @@
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h3>Edit Training Plan</h3>
+{% endblock page_header %}
 
 {% block content %}
-
   {% if message %}
     {{message}}
   {% endif %}  
   {% if not message %}
-    <form method="post" action="{% url 'planner:generate' %}">
+    <form method="post" action="{% url 'planner:generate' %}" class="form">
       {% csrf_token %} 
-      <table>
+      <table class="table table-bordered table-sm">
         {% if Week_1 %}
         <tr>
         {% for day in Week_1 %}
@@ -90,13 +94,13 @@
         
       </table> 
       
-      <button name="submit">Save Changes</button>
+      <button name="submit" class="btn btn-primary">Save Changes</button>
 
     
 
     </form>      
 {% endif %}
-<p>Tests</p>
+
 
 
 

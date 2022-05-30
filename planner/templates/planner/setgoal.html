@@ -1,13 +1,14 @@
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
 
 {% block content %}
 
-<form method="post" action="{% url 'planner:setgoal' %}" >
+<form method="post" action="{% url 'planner:setgoal' %}" class="form" >
   {% csrf_token %}
-  {{goal_form.as_p}}
+  {% bootstrap_form goal_form %}
   <input type="hidden" name="act_id" value="{{act_id}}">
   <input type="hidden" name="act_type" value="{{act_type}}">
-  <button name="submit">Set Goal values</button>
+  <button name="submit" class="btn btn-primary">Set Goal values</button>
 </form>
 set progression here
 
