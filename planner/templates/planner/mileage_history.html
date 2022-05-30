@@ -1,17 +1,24 @@
 {% extends 'planner/base.html' %}
 
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h3>Weekly distance history</h3>
+{% endblock page_header %}
+
 {% block content %}
 
-  <h3>Weekly distance history</h3>
     {% if message %}
       <p>{{message}}</p>
     {% endif %}
     {% if history_list %}
-      <table>
-        <tr>
-          <th>Week beginning</th><th>Distance(KM)</th>
-        </tr>  
-      
+      <table class="table table-bordered table-sm">
+        <thead>
+          <tr>
+            <th scope="col">Week beginning</th>
+            <th scope="col">Distance(KM)</th>
+          </tr>  
+        </thead>
       {% for week in history_list %}
         <tr>
           <td>{{week.date}}</td><td>{{week.distance}}</td>

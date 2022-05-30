@@ -494,7 +494,7 @@ def update_mileage(profile,date_done,act_distance=0):
 
 		entry = {
 			'date':week_initial_str,
-			'distance':str(distance)
+			'distance':str(act_distance)
 		}
 		history.insert(0,entry)
 
