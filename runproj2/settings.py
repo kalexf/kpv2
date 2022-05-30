@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # My apps
     'planner',
+    # Third oarty apps
+    'bootstrap4',
     # default apps
     'django.contrib.admin',
     'django.contrib.auth',
