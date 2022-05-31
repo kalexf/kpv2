@@ -252,6 +252,15 @@ class PacedRun(Activity):
 			self.name = f'{self.distance} km {self.pace}'
 		if self.customname:
 			self.name = f'{self.customname}'
+		# Set targetstring value.
+		if self.progressive:
+			if self.prog_value == PROG_CHOICES[0][0] and self.minutes:
+				self.targetstring = f'{self.minutes}'
+			if self.prog_value == PROG_CHOICES[1][0] and self.distance:
+				self.target_string = f'{self.distance}'
+		else:
+			self.targetstring=""			
+
 		return self		
 
 	def goal_prepop(self):
@@ -305,6 +314,10 @@ class Intervals(Activity):
 		self.name = f'{self.rep_number} x {self.rep_length} m Intervals'
 		if self.customname:
 			self.name = f'{self.customname}'
+		if self.progressive and self.rep_goal and self.rep_length:
+			self.targetstring = f'{self.rep_goal} x {self.rep_length}m'
+		if not self.progressive:
+			self.targetstring = ""	
 		return(self)
 
 	def goal_prepop(self):
@@ -373,6 +386,12 @@ class TimeTrial(Activity):
 		self.has_extra_form = True
 		if self.customname:
 			self.name = f'{self.customname}'
+		if self.progressive and self.goal_time:
+			g_minutes = (self.goal_time // 60) or '00'
+			g_seconds = (self.goal_time % 60) or '00'
+			self.targetstring = f'{g_minutes}:{g_seconds}'
+		if not self.progressive:
+			self.targetstring = ""
 		return(self)	
 
 	def goal_prepop(self):
