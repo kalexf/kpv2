@@ -1,15 +1,19 @@
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
+{% block page_header %}
+<h5>{{activity.name}} completed?</h5>
 
+{% endblock page_header %}
 {% block content %}
 
-<p>{{activity.name}} completed?</p>
 
-<form action="{% url 'planner:submitdate' activity.id date_iso %}" method="post">
+<form class="form"action="{% url 'planner:submitdate' activity.id date_iso %}" method="post">
   {% csrf_token %}
-  {{form.as_p}}
+  {% bootstrap_form form %}
   <input type = "hidden" name="act_id" value={{activity.id}}>
 
-  <button name="submit">Submit completed activity</button>
+  <button class="btn btn-primary"
+    name="submit">Submit completed activity</button>
 </form>
 
 {% endblock content %}

@@ -1,9 +1,17 @@
 {% extends 'planner/base.html' %}
+{% load bootstrap4 %}
+
+{% block page_header %}
+  <h4>Scheduled activities update</h4>
+{% endblock page_header %}
 
 {% block content %}
+  <p>These are activities that were scheduled to be completed.
+    Please select either the 'completed' or 'did not perform' option for each
+    activity as appropriate.</p>
   <!--Create table where user can confirm whether past acitivities completed or not-->
   {% if update_list %}
-  <table>
+  <table class="table table-sm">
     <tr>
       {% for day in update_list %}
         <td>{{day.date_iso}}</td>
@@ -17,7 +25,7 @@
     <tr>
       {% for day in update_list %}
         <td>
-          <a href="{% url 'planner:submitdate' day.act_id day.date_iso %}">Performed Activity</a>
+          <a href="{% url 'planner:submitdate' day.act_id day.date_iso %}">Completed Activity.</a>
         </td>
       {% endfor %}
     <tr>
