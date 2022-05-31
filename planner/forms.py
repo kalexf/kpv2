@@ -64,7 +64,7 @@ class PR_Form(forms.ModelForm):
 		'minutes':'Length(minutes)',
 		'distance':'Length(km)',
 		'progressive':'Progressive?',
-		'customname':'Use Custome name? Leave blank to use default.',
+		'customname':'Use Custom name? Leave blank to use default.',
 			}
 		widgets = {
 			'prog_value':forms.RadioSelect,
@@ -85,7 +85,7 @@ class Int_Form(forms.ModelForm):
 			'rep_length':'Interval length(m)',
 			'rep_number':'Repetitions',
 			'progressive':'Progressive?',
-			'customname':'Use Custome name? Leave blank to use default.',
+			'customname':'Use Custom name? Leave blank to use default.',
 			}
 class TT_Form(forms.ModelForm):
 	class Meta:
@@ -98,7 +98,7 @@ class TT_Form(forms.ModelForm):
 		labels = {
 			'distance':'Distance(km)',
 			'progressive':'Progressive?',
-			'customname':'Use Custome name? Leave blank to use default.',
+			'customname':'Use Custom name? Leave blank to use default.',
 			}			
 class CT_Form(forms.ModelForm):
 	class Meta:

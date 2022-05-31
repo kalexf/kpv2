@@ -113,6 +113,7 @@ class Activity(models.Model):
 	# User readable description of the activity for display on home screen & schedule
 	name = models.CharField(max_length=40,default='nameless')
 	customname = models.CharField(max_length=40,blank=True,null=True)
+	targetstring = models.CharField(max_length=40,blank=True,null=True)
 	# User the activity is connected to
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
 	# Represents the total distance covered during the activity, used for tracking
@@ -378,10 +379,13 @@ class TimeTrial(Activity):
 		"""returns a dictionary of values that can be used to prepopulate
 		goal form for this activity"""
 		prepop_dict = {}
-		prepop_dict['goal_minutes'] = (self.goal_time // 60)
-		prepop_dict['goal_seconds'] = (self.goal_time % 60)
-		prepop_dict['inc_seconds'] = self.prog_time
-
+		try:
+			prepop_dict['goal_minutes'] = (self.goal_time // 60)
+			prepop_dict['goal_seconds'] = (self.goal_time % 60)
+			prepop_dict['inc_seconds'] = self.prog_time
+		except:
+			prepop_dict['inc_seconds'] = 60
+		
 		return prepop_dict
 	
 
