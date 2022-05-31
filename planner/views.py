@@ -137,7 +137,8 @@ def add_new(request,act_type=''):
 				act_id = new_activity.id
 				context = {
 					'goal_form':goal_form,
-					'act_id':act_id,'act_type':act_type
+					'act_id':act_id,
+					'act_type':act_type
 					}
 				return render(request,'planner/setgoal.html',context)
 		return redirect('planner:home')	
@@ -302,10 +303,10 @@ def edit(request,act_id=None):
 	activity = get_act(act_id)
 	if not activity:
 		raise Http404
-	else:
 	# Check ownership.
-		if activity.owner != request.user:
-			raise Http404			
+	if activity.owner != request.user:
+		raise Http404			
+	
 	model = get_model(activity.my_type)
 	this_act = model.objects.get(id=act_id)
 	# Save Form		
@@ -314,9 +315,18 @@ def edit(request,act_id=None):
 		if form.is_valid():
 			form.save()
 		this_act.setvalues()
-		if this_act.progressive:
-			this_act.setgoals(request.POST)	
 		this_act.save()
+		# If progressive, go to setgoals page.
+		if this_act.progressive:
+			goal_form = GOAL_FORMS[activity.my_type]
+			goal_form = goal_form(this_act.goal_prepop())
+			context = {
+					'goal_form':goal_form,
+					'act_id':act_id,
+					'act_type':activity.my_type
+					}
+			return render(request,'planner/setgoal.html',context)		
+		# Non-progressive, redirect home.	
 		return redirect('planner:home')		
 	# Get appropriate form and populate it	
 	form = ADD_FORMS[model.act_type](instance=this_act)
@@ -325,14 +335,9 @@ def edit(request,act_id=None):
 	'name':activity.name,
 	'act_id':act_id
 	}
-	# If activity is progressive, get and populate progression form.
-	if activity.progressive:
-		prog_form = GOAL_FORMS[activity.my_type]
-		prog_form = prog_form(this_act.goal_prepop())
-		context['prog_form'] = prog_form	
 	return render(request,'planner/edit.html',context)
 
-
+			
 @login_required
 def delete(request, act_id=None):
 	"""For deleting activities"""

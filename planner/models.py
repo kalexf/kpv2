@@ -49,18 +49,7 @@ DIFF_CHOICES = [
 	('2','Moderate'),
 	('3','Hard')
 	]
-# Day of week choices iterable for profile preferences.
-"""
-DOW_CHOICES = [
-	(0,'Monday'),
-	(1,'Tuesday'),
-	(2,'Wednesday'),
-	(3,'Thrusday'),
-	(4,'Friday'),
-	(5,'Saturday'),
-	(6,'Sunday')
-	]
-"""	
+
 # Used for Number of weeks / schedule preference
 WEEKS_CHOICES = [
 		(1,'1 Week'),
@@ -94,7 +83,6 @@ class Profile(models.Model):
 		choices=WEEKS_CHOICES,
 		)
 	
-
 	
 
 class CompletedAct(models.Model):
@@ -203,11 +191,7 @@ class PacedRun(Activity):
 		) 			
 	# Goal distance for activity - increases towards this value if progressive.
 	goal_distance = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
-
 	
-
-
-
 	def progress(self):
 		"""Increas the activity's base value by its progression value"""
 		# Progressing time
@@ -221,7 +205,6 @@ class PacedRun(Activity):
 			if self.distance and self.distance >= self.goal_distance:
 				self.progressive = False
 		return self		
-
 
 	def setgoals(self,post):
 		"""Sets Goal/progression values from form data"""
@@ -321,15 +304,14 @@ class Intervals(Activity):
 		self.name = f'{self.rep_number} x {self.rep_length} m Intervals'
 		if self.customname:
 			self.name = f'{self.customname}'
-		return(self)	
+		return(self)
+
 	def goal_prepop(self):
 		"""returns a dictionary of values that can be used to prepopulate
 		goal form for this activity"""
 		prepop_dict = {}
 		prepop_dict['rep_goal'] = self.rep_goal
 		prepop_dict['increment'] = self.increment
-
-
 		return prepop_dict
 	
 
@@ -345,7 +327,6 @@ class TimeTrial(Activity):
 	# Number of seconds to be taken off time each time exercise done.
 	prog_time = models.PositiveSmallIntegerField(blank=True,null=True)
 	
-
 	def update(self,post,date_done):
 		"""update values from submitted completion form data"""
 		self.difficulty = post.get('difficulty')
@@ -356,15 +337,17 @@ class TimeTrial(Activity):
 			self.time = int(minutes) * 60
 		if seconds:
 			self.time += int(seconds)	
-		
 		return self
 
 	def progress(self):
-		if self.time:
-			self.time -= self.prog_time
-			if self.time <= self.goal_time:
-				self.progressive = False
-		return self	
+		try:
+			if self.time:
+				self.time -= self.prog_time
+				if self.time <= self.goal_time:
+					self.progressive = False
+				return self	
+		except:			
+			return self	
 	
 	def setgoals(self,post):
 		"""Sets Goal/progression values from form data"""
