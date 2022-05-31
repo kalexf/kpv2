@@ -1,6 +1,7 @@
     <!-- home page showing activity table, options for adding/editing -->
 
   {% extends 'planner/base.html' %}
+  {% load bootstrap4 %}
   {% block page_header %}
     <h3>Title for Home page</h3>
       <p>Use this page to create new activities and build a schedule</p>
@@ -9,7 +10,7 @@
       {% if user.is_authenticated %} <!-- Contains entire page -->
         {% if schedule_list %}
           <h4>User Schedule</h4>
-            <table>
+            <table class="table table-bordered table-sm">
               <!-- schedule week one -->
               <tr>
                 {% for day in schedule_list|slice:":7" %}
@@ -65,8 +66,8 @@
         </p>  
 
         <!--Individual Activities and links for editing / submitting them -->
-        <h4>User Activites</h4>
-          <table>
+        <h4>User Activites List</h4>
+          <table class="table table-bordered table-sm">
             <tr>
               <th>Name</th>
             </tr>
