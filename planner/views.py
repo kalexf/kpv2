@@ -7,8 +7,9 @@ from decimal import Decimal
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
 	Profile, CompletedAct)
-from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
-	Int_Goal_Form, SubmissionForm, TT_SubForm, Profile_Form, PlanForm )
+from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, 
+	PR_Goal_Form, Int_Goal_Form, SubmissionForm, TT_SubForm, 
+	Profile_Form, PaceForm, PlanForm )
 
 
 # List of all activity models.
@@ -177,14 +178,16 @@ def settings(request):
 	
 	if request.method != 'POST':
 		form = Profile_Form(instance=profile)
-		context = {'form':form}
+		paces_form = PaceForm(instance=profile)
+		context = {'form':form,'paces_form':paces_form}
 		return render(request,'planner/profilesettings.html',context)
 
 	else:
 		# POST request, submitted form
 		# Save new values	
 		form = Profile_Form(instance=profile,data=request.POST)
-		form.save()
+		if form.is_valid():
+			form.save()
 		# Check if user has changed plan length setting, if it has been 
 		# changed clear plan.
 		if form['plan_length'] != profile.plan_length:
@@ -195,6 +198,18 @@ def settings(request):
 		
 		return redirect('planner:home')
 
+@login_required
+def savepacesettings(request):
+	"""
+	Saves submitted pace settings form.
+	"""
+	if request.method == 'POST':
+		profile = get_profile(request.user)		
+		pace_form = PaceForm(instance=profile,data=request.POST)
+		if pace_form.is_valid():
+			pace_form.save()
+	
+	return redirect('planner:home')
 
 @login_required
 def submit(request,act_id,date_iso):

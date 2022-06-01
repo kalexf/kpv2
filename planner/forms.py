@@ -2,7 +2,7 @@ from django import forms
 
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 	Profile)
-from .models import DIFF_CHOICES, WEEKS_CHOICES
+from .models import DIFF_CHOICES, WEEKS_CHOICES, PACES
 
 ### FORMS ###
 
@@ -42,7 +42,26 @@ class Profile_Form(forms.ModelForm):
 		
 		}
 		
-
+class PaceForm(forms.ModelForm):
+	"""
+	For for selecing estimated pace values.
+	"""
+	class Meta:
+		model = Profile
+		fields = [
+			'pace_0',
+			'pace_1',
+			'pace_2',
+			'pace_3',
+			'pace_4',
+			]
+		labels = {
+			'pace_0':PACES[0],
+			'pace_1':PACES[1],
+			'pace_2':PACES[2],
+			'pace_3':PACES[3],
+			'pace_4':PACES[4],
+		}	
 # ADD FORMS -Forms for creating new Activity instances
 # - fields vary depending on activity type
 

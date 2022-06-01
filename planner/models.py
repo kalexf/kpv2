@@ -82,7 +82,13 @@ class Profile(models.Model):
 		default=2,
 		choices=WEEKS_CHOICES,
 		)
-	
+	# User-editable pace values for estimating distance on timed activities.
+	pace_0 = models.DecimalField(decimal_places=2,max_digits=4,default=6.5)
+	pace_1 = models.DecimalField(decimal_places=2,max_digits=4,default=9.5)
+	pace_2 = models.DecimalField(decimal_places=2,max_digits=4,default=10.5)
+	pace_3 = models.DecimalField(decimal_places=2,max_digits=4,default=11.5)
+	pace_4 = models.DecimalField(decimal_places=2,max_digits=4,default=13.5)
+
 	
 
 class CompletedAct(models.Model):

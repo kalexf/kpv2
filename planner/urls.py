@@ -19,7 +19,10 @@ urlpatterns = [
 	# Submit details of rest day
 	path('submit/<str:date_iso>/',views.restdate,name='restdate'),
 	path('generate/',views.generate_plan,name='generate'),
+	# Save changes to general settings.
 	path('settings/',views.settings,name='settings'),
+	# Save changes to pace settings.
+	path('savepace/', views.savepacesettings,name='savepacesettings'),
 	path('history/',views.view_history,name='history'),
 	path('mileage/', views.mileage,name='mileage'),
 	]
