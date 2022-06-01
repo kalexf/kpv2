@@ -89,6 +89,19 @@ class Profile(models.Model):
 	pace_3 = models.DecimalField(decimal_places=2,max_digits=4,default=11.5)
 	pace_4 = models.DecimalField(decimal_places=2,max_digits=4,default=13.5)
 
+	def user_pace(self,pace_value):
+		"""Give pace name, get speed for that user"""
+		paces = {
+			PACES[0]: self.pace_0,
+			PACES[1]: self.pace_1,
+			PACES[2]: self.pace_3,
+			PACES[3]: self.pace_3,
+			PACES[4]: self.pace_4,
+				}
+		return (paces[pace_value])		
+
+
+
 	
 
 class CompletedAct(models.Model):
@@ -172,7 +185,7 @@ class PacedRun(Activity):
 	prog_value = models.CharField(
 		max_length=4, 
 		choices=PROG_CHOICES,
-		default=PROG_CHOICES[0][0]
+		default=PROG_CHOICES[0][0],
 		)
 	# Progression values - amount by which activity values increased/ decreased
 	prog_minutes = models.PositiveSmallIntegerField(null=True,blank=True)
@@ -232,44 +245,45 @@ class PacedRun(Activity):
 
 		return(self)
 
-	def setvalues(self):
+	def setvalues(self,profile):
 		"""Sets the name field for the activity, and checks / sets any other
 		activity-specific fields"""
 		self.my_type = self.act_type
-		# Set infostring value.
-		if self.progressive:
-			if self.prog_value == self.PROG_CHOICES[0][0]:
-				self.infostring = f'Goal:{self.goal_minutes} minutes'
-			if self.prog_value == self.PROG_CHOICES[1][0]:
-				self.target_string = f'Goal:{self.goal_distance} KM'
-		else:
-			self.infostring=""			
-		
-		# If custom name used set it as activity name.
+		# If progressive, check that prog value is correct and set goal string.
+		if not self.distance and not self.minutes:
+			self.progressive = False
+			self.infostring = ""
+			self.name = f'{self.pace}'
+			
+		if self.distance and not self.minutes:
+			self.prog_value = self.PROG_CHOICES[1][0]
+		if not self.distance and self.minutes:
+			self.prog_value = self.PROG_CHOICES[0][0]
+		# Set name
 		if self.customname:
 			self.name = f'{self.customname}'
-			return self
-		
-		# CASE 1- neither value given. Pace only name, return
-		if not self.minutes and not self.distance:
-			self.name = f'{self.pace}'
-			return self
-		# CASE 2-BOTH values given, name based on type, return
-		if self.minutes and self.distance:
-			if self.prog_value == self.PROG_CHOICES[0][0]: #time
-				self.name = f'{self.minutes} minute {self.pace}'
-			else: #distance
-				self.name = f'{self.distance} km {self.pace}'
-			return self
-		# CASE 3 - one or other given, return appropriate name and chekc type
-		if self.minutes:
-			self.prog_value = self.PROG_CHOICES[0][0] 
+		elif self.prog_value == self.PROG_CHOICES[0][0] and self.minutes:
 			self.name = f'{self.minutes} minute {self.pace}'
-		else:
-			self.prog_value = self.PROG_CHOICES[1][0]
-			self.name = f'{self.distance} km {self.pace}'
+		elif self.prog_value == self.PROG_CHOICES[1][0] and self.distance:
+			self.name = f'{self.distance} KM {self.pace}'
+		# If progressive and has goal value, set infostring.
+		if self.progressive:
+			if (self.prog_value == self.PROG_CHOICES[0][0]) and self.goal_minutes:
+				self.infostring = f'Goal:{self.goal_minutes} minutes'
+			elif (self.prog_value == self.PROG_CHOICES[1][0]) and self.goal_distance:
+				self.infostring = f'Goal:{self.goal_distance} KM'
+		elif not self.progressive:
+			self.infostring = ""
+		# Set estimated distance.
+		if self.prog_value == self.PROG_CHOICES[0][0]:#minutes
+			dec_pace = profile.user_pace(self.pace)
+			self.distance = dec_pace * Decimal(self.minutes / 60)
 
-		return self		
+
+
+		return self
+
+			
 
 	def goal_prepop(self):
 		"""returns a dictionary of values that can be used to prepopulate
@@ -313,7 +327,7 @@ class Intervals(Activity):
 			self.increment = int(increment)	
 		return(self)
 
-	def setvalues(self):
+	def setvalues(self,profile=None):
 		"""Sets the name field for the activity"""
 		self.distance = Decimal((self.rep_length/1000) * self.rep_number)
 		self.my_type = self.act_type
@@ -356,7 +370,7 @@ class TimeTrial(Activity):
 			self.best = time 
 			return self		
 	
-	def setvalues(self):
+	def setvalues(self,profile=None):
 		"""Sets the name field for the activity"""
 		self.my_type = self.act_type
 		self.name = f'{self.distance}km Time Trial'
@@ -380,7 +394,7 @@ class CrossTrain(Activity):
 	exercise_type = models.CharField(max_length=30,default='Cross Training')
 
 
-	def setvalues(self):
+	def setvalues(self,profile=None):
 		"""Sets the name field for the activity"""
 		if not self.exercise_type:
 			self.exercise_type = 'Cross Training'

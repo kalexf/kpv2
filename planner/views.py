@@ -127,7 +127,7 @@ def add_new(request,act_type=''):
 		if form.is_valid():
 			new_activity = form.save(commit=False)
 			new_activity.owner = request.user
-			new_activity.setvalues()
+			new_activity.setvalues(get_profile(request.user))
 			new_activity.save()
 			# If new activity is progressive, render view for setting goals.
 			if new_activity.progressive:
@@ -253,10 +253,10 @@ def submit(request,act_id,date_iso):
 		this_act.update(request.POST,date_done)
 		if this_act.progressive and request.POST.get('completed'):
 				this_act.progress()
-		this_act.setvalues()
+		profile = get_profile(request.user)
+		this_act.setvalues(profile)
 		this_act.save()
 		# Update user's history
-		profile = get_profile(request.user)
 		profile = update_history(profile,date_iso,distance,activity.name)
 		# If activity has distance value, use it to update mileage.
 		if distance:
@@ -397,7 +397,7 @@ def setgoal(request):
 	activity = model.objects.get(id=act_id)
 	# Give the values to activity and have it update itself
 	activity.setgoals(request.POST)
-	activity.setvalues()
+	activity.setvalues(get_profile(request.user))
 	activity.save()	
 	return redirect('planner:home')
 
