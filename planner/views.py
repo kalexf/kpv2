@@ -8,8 +8,7 @@ from decimal import Decimal
 from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain, 
 	Profile, CompletedAct)
 from .forms import (PR_Form, Int_Form, TT_Form, CT_Form, PR_Goal_Form, 
-	Int_Goal_Form, TT_Goal_Form, SubmissionForm, TT_SubForm, 
-	Profile_Form, PlanForm )
+	Int_Goal_Form, SubmissionForm, TT_SubForm, Profile_Form, PlanForm )
 
 
 # List of all activity models.
@@ -37,8 +36,6 @@ ADD_FORMS = {
 GOAL_FORMS = {
 	ACT_TYPES[0].act_type:PR_Goal_Form,
 	ACT_TYPES[1].act_type:Int_Goal_Form,
-	ACT_TYPES[2].act_type:TT_Goal_Form,
-	
 	}
 # Forms for submitting details of completed activity.	
 SUB_FORMS = {
@@ -385,6 +382,7 @@ def setgoal(request):
 	activity = model.objects.get(id=act_id)
 	# Give the values to activity and have it update itself
 	activity.setgoals(request.POST)
+	activity.setvalues()
 	activity.save()	
 	return redirect('planner:home')
 

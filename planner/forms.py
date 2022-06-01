@@ -7,7 +7,6 @@ from .models import DIFF_CHOICES, WEEKS_CHOICES
 ### FORMS ###
 
 
-
 class PlanForm(forms.Form):
 	"""
 	Dynamic form used for training plan creation page.
@@ -92,12 +91,10 @@ class TT_Form(forms.ModelForm):
 		model = TimeTrial
 		fields = [
 			'distance',
-			'progressive',
 			'customname',
 			]
 		labels = {
 			'distance':'Distance(km)',
-			'progressive':'Progressive?',
 			'customname':'Use Custom name? Leave blank to use default.',
 			}			
 class CT_Form(forms.ModelForm):
@@ -174,27 +171,6 @@ class Int_Goal_Form(forms.Form):
 		)
 
 	
-class TT_Goal_Form(forms.Form):
-	goal_minutes = forms.IntegerField(
-		required = False,
-		max_value = 720,
-		min_value = 0,
-		label = 'Goal (minutes)',
-
-
-		)
-	goal_seconds = forms.IntegerField(
-		required = False,
-		max_value = 59,
-		min_value = 0,
-		label = 'Goal (seconds)',
-		)
-	inc_seconds = forms.IntegerField(
-		required = False,
-		min_value = 1,
-		max_value = 60,
-		label = 'Increment(seconds)',
-		)
 
 	
 			

@@ -113,7 +113,7 @@ class Activity(models.Model):
 	# User readable description of the activity for display on home screen & schedule
 	name = models.CharField(max_length=40,default='nameless')
 	customname = models.CharField(max_length=40,blank=True,null=True)
-	targetstring = models.CharField(max_length=40,blank=True,null=True)
+	infostring = models.CharField(max_length=40,blank=True,null=True)
 	# User the activity is connected to
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
 	# Represents the total distance covered during the activity, used for tracking
@@ -168,11 +168,9 @@ class PacedRun(Activity):
 		choices=PROG_CHOICES,
 		default=PROG_CHOICES[0][0]
 		)
-	
 	# Progression values - amount by which activity values increased/ decreased
 	prog_minutes = models.PositiveSmallIntegerField(null=True,blank=True)
 	prog_distance = models.DecimalField(max_digits=5,decimal_places=2,null=True,blank=True)
-
 	# Pace / relative exertion the activity is done at
 	pace = models.CharField(
 		max_length=18, 
@@ -231,8 +229,22 @@ class PacedRun(Activity):
 	def setvalues(self):
 		"""Sets the name field for the activity, and checks / sets any other
 		activity-specific fields"""
-		# CASE 1- neither value given. Pace only name, return
 		self.my_type = self.act_type
+		# Set infostring value.
+		if self.progressive:
+			if self.prog_value == self.PROG_CHOICES[0][0]:
+				self.infostring = f'Goal:{self.goal_minutes} minutes'
+			if self.prog_value == self.PROG_CHOICES[1][0]:
+				self.target_string = f'Goal:{self.goal_distance} KM'
+		else:
+			self.infostring=""			
+		
+		# If custom name used set it as activity name.
+		if self.customname:
+			self.name = f'{self.customname}'
+			return self
+		
+		# CASE 1- neither value given. Pace only name, return
 		if not self.minutes and not self.distance:
 			self.name = f'{self.pace}'
 			return self
@@ -250,16 +262,6 @@ class PacedRun(Activity):
 		else:
 			self.prog_value = self.PROG_CHOICES[1][0]
 			self.name = f'{self.distance} km {self.pace}'
-		if self.customname:
-			self.name = f'{self.customname}'
-		# Set targetstring value.
-		if self.progressive:
-			if self.prog_value == PROG_CHOICES[0][0] and self.minutes:
-				self.targetstring = f'{self.minutes}'
-			if self.prog_value == PROG_CHOICES[1][0] and self.distance:
-				self.target_string = f'{self.distance}'
-		else:
-			self.targetstring=""			
 
 		return self		
 
@@ -274,10 +276,7 @@ class PacedRun(Activity):
 		if self.prog_distance:
 			prepop_dict['increment_value'] = self.prog_distance
 		return prepop_dict	
-
-
-
-		
+	
 
 class Intervals(Activity):
 	"""Repeated short runs with a rest interval between each repetition."""
@@ -310,14 +309,15 @@ class Intervals(Activity):
 
 	def setvalues(self):
 		"""Sets the name field for the activity"""
+		self.distance = Decimal((self.rep_length/1000) * self.rep_number)
 		self.my_type = self.act_type
 		self.name = f'{self.rep_number} x {self.rep_length} m Intervals'
 		if self.customname:
 			self.name = f'{self.customname}'
 		if self.progressive and self.rep_goal and self.rep_length:
-			self.targetstring = f'{self.rep_goal} x {self.rep_length}m'
+			self.infostring = f'Goal reps:{self.rep_goal} x {self.rep_length}m'
 		if not self.progressive:
-			self.targetstring = ""	
+			self.infostring = ""	
 		return(self)
 
 	def goal_prepop(self):
@@ -334,51 +334,22 @@ class TimeTrial(Activity):
 	# User readable act_type and description
 	act_type = ACTIVITY_DESCRIPTIONS[2]['act_type']
 	description = ACTIVITY_DESCRIPTIONS[2]['description']
-	# time represents the most recent performed time for the activity.
-	time = models.PositiveSmallIntegerField(blank=True,null=True)
-	# Goal time represents the eventual goal time attempting to beat.
-	goal_time = models.PositiveSmallIntegerField(blank=True,null=True)
-	# Number of seconds to be taken off time each time exercise done.
-	prog_time = models.PositiveSmallIntegerField(blank=True,null=True)
+	# best represent personal best time in seconds.
+	best = models.PositiveSmallIntegerField(blank=True,null=True)
 	
 	def update(self,post,date_done):
 		"""update values from submitted completion form data"""
 		self.difficulty = post.get('difficulty')
 		self.last_done = date_done	
-		minutes = post.get('minutes')
-		seconds = post.get('seconds')
-		if minutes:
-			self.time = int(minutes) * 60
-		if seconds:
-			self.time += int(seconds)	
-		return self
-
-	def progress(self):
-		try:
-			if self.time:
-				self.time -= self.prog_time
-				if self.time <= self.goal_time:
-					self.progressive = False
-				return self	
-		except:			
-			return self	
+		minutes = int(post.get('minutes') or 0)
+		seconds = int(post.get('seconds') or 0)
+		time = (minutes * 60) + seconds
+		if self.best and self.best <= time:
+			return self
+		else:
+			self.best = time 
+			return self		
 	
-	def setgoals(self,post):
-		"""Sets Goal/progression values from form data"""
-		goal_minutes = post.get('goal_minutes')
-		goal_seconds = post.get('goal_seconds')
-		inc_seconds = post.get('inc_seconds')
-		time = 0
-		if goal_minutes:
-			time = int(goal_minutes) * 60
-		if goal_seconds:
-			time += int(goal_seconds)
-		if time:
-			self.goal_time = time	
-		if inc_seconds:
-			self.prog_time = inc_seconds		
-		return(self)
-
 	def setvalues(self):
 		"""Sets the name field for the activity"""
 		self.my_type = self.act_type
@@ -386,28 +357,13 @@ class TimeTrial(Activity):
 		self.has_extra_form = True
 		if self.customname:
 			self.name = f'{self.customname}'
-		if self.progressive and self.goal_time:
-			g_minutes = (self.goal_time // 60) or '00'
-			g_seconds = (self.goal_time % 60) or '00'
-			self.targetstring = f'{g_minutes}:{g_seconds}'
-		if not self.progressive:
-			self.targetstring = ""
+		if self.best:
+			PB_minutes = int(self.best) // 60
+			PB_seconds = int(self.best) % 60
+			self.infostring = f'PB: {PB_minutes}:{PB_seconds}'
+			if PB_seconds < 10:
+				self.infostring += '0'
 		return(self)	
-
-	def goal_prepop(self):
-		"""returns a dictionary of values that can be used to prepopulate
-		goal form for this activity"""
-		prepop_dict = {}
-		try:
-			prepop_dict['goal_minutes'] = (self.goal_time // 60)
-			prepop_dict['goal_seconds'] = (self.goal_time % 60)
-			prepop_dict['inc_seconds'] = self.prog_time
-		except:
-			prepop_dict['inc_seconds'] = 60
-		
-		return prepop_dict
-	
-
 
 class CrossTrain(Activity):
 	"""Any other exercise type, which the user wants to be taken into account
