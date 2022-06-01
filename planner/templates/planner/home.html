@@ -69,12 +69,12 @@
         <h4>User Activites List</h4>
           <table class="table table-bordered table-sm">
             <tr>
-              <th>Name</th><th>Target?</th>
+              <th>Name</th><th>Info</th>
             </tr>
               {% for act in activities %}
             <tr>
               <td>{{act.name}}</td>
-              <td>{{act.targetstring}}</td>
+              <td>{{act.infostring}}</td>
               <td><a href="{% url 'planner:submitdate' act.id date_iso %}">Submit</td>
               <td><a href="{% url 'planner:edit' act.id %}">Edit</a></td>
               <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
