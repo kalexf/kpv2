@@ -89,6 +89,7 @@ class Profile(models.Model):
 	pace_3 = models.DecimalField(decimal_places=2,max_digits=4,default=11.5)
 	pace_4 = models.DecimalField(decimal_places=2,max_digits=4,default=13.5)
 
+	
 	def user_pace(self,pace_value):
 		"""Give pace name, get speed for that user"""
 		paces = {

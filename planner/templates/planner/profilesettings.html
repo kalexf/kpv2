@@ -22,8 +22,35 @@
  
 
 
-{% endif %}
- <p># TODO history resets</p>
-}
 
+{% endif %}
+<div>
+  <p>
+    <form class="form" action="{% url 'planner:reset' 'reveal' %}" method="post">
+    {% csrf_token %}
+    <button name="submit" class="btn btn-primary">Show data reset options</button>
+    </form>
+  </p>
+{% if reset_visible %}
+  <p>
+    <a href="{% url 'planner:reset' 'plan' %}">Delete Plan?</a>
+    {% if plan %}
+    <a href="{% url 'planner:reset' 'plan' 'delete'%}">Confirm Delete(final)</a>
+    {% endif %} 
+  </p>
+  <p>
+    <a href="{% url 'planner:reset' 'activity_hist' %}">Delete Activity History</a>
+    {% if activity_hist %}
+    <a href="{% url 'planner:reset' 'activity_hist' 'delete' %}">Confirm Delete(final).</a>
+    {% endif %}
+  </p>
+  <p>
+    <a href="{% url 'planner:reset' 'distance_hist' %}">Delete Distance History</a>
+    {% if distance_hist %}
+      <a href="{% url 'planner:reset' 'distance_hist' 'delete'%}">Confirm Delete(final)</a>
+
+    {% endif %} 
+  </p>
+{% endif %}
+</div>  
 {% endblock content %}

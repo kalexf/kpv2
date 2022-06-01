@@ -25,6 +25,9 @@ urlpatterns = [
 	path('savepace/', views.savepacesettings,name='savepacesettings'),
 	path('history/',views.view_history,name='history'),
 	path('mileage/', views.mileage,name='mileage'),
+	# Delete various data from profile
+	path('reset/<str:route>',views.reset,name='reset'),
+	path('reset/<str:route>/<str:delete>',views.reset,name='reset'),
 	]
 
 	

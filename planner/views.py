@@ -349,6 +349,29 @@ def edit(request,act_id=None):
 	}
 	return render(request,'planner/edit.html',context)
 
+@login_required
+def reset(request,route,delete=None):
+	"""For resetting various profile data."""
+	# Delete confirmation, reset field.
+	if delete == 'delete':
+		profile = get_profile(request.user)
+		if route == 'plan':
+			profile.plan = None	
+		if route == 'activity_hist':
+			profile.history = None 
+		if route == 'distance_hist':
+			profile.mileage_history = None
+
+		profile.save()
+
+		return redirect('planner:home')	
+	
+
+	context = {'reset_visible':True}
+	context[route] = True
+	return render(request,'planner/profilesettings.html',context)
+	
+	
 			
 @login_required
 def delete(request, act_id=None):
