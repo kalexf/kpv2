@@ -5,7 +5,7 @@
 {% block content %}
 <!--Form page for editing personal settings, schedule settings -->
 {% if form %}
-<h4>Edit schedule length settings</h4>
+<h5 style="color:teal;">Schedule length settings:</h5>
 <form class="form" action="{% url 'planner:settings' %}" method="post">
   {% csrf_token %}
   {% bootstrap_form form %}
@@ -13,7 +13,7 @@
 </form> 
 {% endif %}  
 {% if paces_form %}
-  <h4>Edit pace settings</h4>
+  <h5 style="color:teal;">Pace settings:</h5>
   <form class="form" action="{% url 'planner:savepacesettings' %}" method="post">
   {% csrf_token %}
   {% bootstrap_form paces_form %}
@@ -24,6 +24,7 @@
 
 
 {% endif %}
+{% if not reset_visible %}
 <div>
   <p>
     <form class="form" action="{% url 'planner:reset' 'reveal' %}" method="post">
@@ -31,23 +32,29 @@
     <button name="submit" class="btn btn-primary">Show data reset options</button>
     </form>
   </p>
+ </div> 
+{% endif %} 
 {% if reset_visible %}
+<div> 
   <p>
     <a href="{% url 'planner:reset' 'plan' %}">Delete Plan?</a>
     {% if plan %}
-    <a href="{% url 'planner:reset' 'plan' 'delete'%}">Confirm Delete(final)</a>
+    <a href="{% url 'planner:reset' 'plan' 'delete'%}"style="color:Tomato;">
+    Confirm Delete(final)</a>
     {% endif %} 
   </p>
   <p>
     <a href="{% url 'planner:reset' 'activity_hist' %}">Delete Activity History</a>
     {% if activity_hist %}
-    <a href="{% url 'planner:reset' 'activity_hist' 'delete' %}">Confirm Delete(final).</a>
+    <a href="{% url 'planner:reset' 'activity_hist' 'delete' %}"style="color:Tomato;">
+    Confirm Delete(final).</a>
     {% endif %}
   </p>
   <p>
     <a href="{% url 'planner:reset' 'distance_hist' %}">Delete Distance History</a>
     {% if distance_hist %}
-      <a href="{% url 'planner:reset' 'distance_hist' 'delete'%}">Confirm Delete(final)</a>
+      <a href="{% url 'planner:reset' 'distance_hist' 'delete'%}"style="color:Tomato;">
+      Confirm Delete(final)</a>
 
     {% endif %} 
   </p>

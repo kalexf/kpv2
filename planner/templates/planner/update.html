@@ -11,12 +11,15 @@
     activity as appropriate.</p>
   <!--Create table where user can confirm whether past acitivities completed or not-->
   {% if update_list %}
-  <table class="table table-sm">
+  <table class="table table-md table-bordered">
+    <thead class="thead-light">
     <tr>
       {% for day in update_list %}
-        <td>{{day.date_iso}}</td>
+        <th>{{day.date_iso}}</th>
       {% endfor %}
     </tr>
+  </thead>
+  <tbody>
     <tr>
       {% for day in update_list %}
         <td>{{day.name}}</td>
@@ -28,13 +31,16 @@
           <a href="{% url 'planner:submitdate' day.act_id day.date_iso %}">Completed Activity.</a>
         </td>
       {% endfor %}
+    </tr>
     <tr>
       {% for day in update_list %}
         <td>
           <a href="{% url 'planner:restdate' day.date_iso %}">Did not complete.</a>
         </td>
       {% endfor %}
-    </tr>      
+    </tr>
+    </tbody> 
+   </table>      
 
 
   

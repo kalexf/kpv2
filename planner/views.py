@@ -358,10 +358,12 @@ def reset(request,route,delete=None):
 		if route == 'plan':
 			profile.plan = None	
 		if route == 'activity_hist':
-			profile.history = None 
+			profile.history = None
+
 		if route == 'distance_hist':
 			profile.mileage_history = None
-
+		# Delete all completed acts.
+		clean_completed_acts(request.user,-1)
 		profile.save()
 
 		return redirect('planner:home')	
@@ -389,7 +391,8 @@ def delete(request, act_id=None):
 		context = {'activity':activity}
 		return render(request,'planner/delete.html',context)
 	if request.method == 'POST':	
-		activity.delete()		
+		activity.delete()
+		# Delete any completed acts that		
 		return redirect('planner:home')
 
 
@@ -606,7 +609,8 @@ def get_act(act_id):
 
 class Day:
 	"""
-	For constructing schedule list used on home page
+	For constructing schedule list used on home page. Home screen schedule
+	is built from a list of these objects.
 	"""
 	def __init__(self,day_date,name=rest_string):
 		self.date_str = day_date.strftime(dateFormat)
@@ -616,8 +620,8 @@ class Day:
 		self.complete = False
 		self.past = False
 		self.act_id = 0
-		# Added to fix a bug where schedule spanned new year
 		self.date_iso = day_date.isoformat()
+		self.link = False
 
 
 def get_schedule_list(profile,replace=True):
@@ -695,4 +699,8 @@ def get_schedule_list(profile,replace=True):
 					if past_act.date_done == date.today():
 						day.name = past_act.name
 						day.complete = True		
+				# If 'today' has activity and is not complete, 
+				# set its link attr True.
+				if not day.complete and (day.name != rest_string):
+					day.link = True
 	return sch_list

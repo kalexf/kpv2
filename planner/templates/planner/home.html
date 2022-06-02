@@ -25,6 +25,9 @@
                 {% for day in schedule_list|slice:":7" %}
                 <td>
                     {{day.name}}
+                    {% if day.link %}
+                    <a href="{% url 'planner:submitdate' day.act_id date_iso %}">Submit</a> 
+                    {% endif %}
                 </td>
                 {% endfor %}
               </tr>
