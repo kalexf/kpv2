@@ -1,25 +1,31 @@
 {% extends 'planner/base.html' %}
 {% load bootstrap4 %}
 
-{% block page_header %}
-  <h3>Edit Training Plan</h3>
-{% endblock page_header %}
+
+
 
 {% block content %}
   {% if message %}
     {{message}}
   {% endif %}  
   {% if not message %}
+  <h4>Edit Training Plan:</h4>
+   <div style="font-size: 80%;">
     <form method="post" action="{% url 'planner:generate' %}" class="form">
       {% csrf_token %} 
-      <table class="table table-bordered table-sm">
+      <table class="table table-bordered table-responsive table-sm">
         {% if Week_1 %}
+        <thead>
         <tr>
+          <th>Week:</th>
         {% for day in Week_1 %}
-         <td>{{day}}</td>
+         <th>{{day}}</th>
         {% endfor %}
       </tr>
+      </thead>
+      <tbody >
       <tr>
+          <th>1</th>
           <td>{{form.day_1}}</td>
           <td>{{form.day_2}}</td>
           <td>{{form.day_3}}</td>
@@ -28,17 +34,16 @@
           <td>{{form.day_6}}</td>
           <td>{{form.day_7}}</td>
         </tr>
+     
 
         
         {% endif %}
 
         {% if Week_2 %}  
-        <tr>
-        {% for day in Week_2 %}
-         <td>{{day}}</td>
-        {% endfor %}
-        </tr>
+        
+       
       <tr>
+          <th>2</th>
           <td>{{form.day_8}}</td>
           <td>{{form.day_9}}</td>
           <td>{{form.day_10}}</td>
@@ -46,18 +51,16 @@
           <td>{{form.day_12}}</td>
           <td>{{form.day_13}}</td>
           <td>{{form.day_14}}</td>
-        </tr>  
+        </tr> 
+       
 
         
         {% endif %}
 
         {% if Week_3 %}
-        <tr>
-        {% for day in Week_3 %}
-         <td>{{day}}</td>
-        {% endfor %}
-      </tr>
+      
       <tr>
+          <th>3</th>
           <td>{{form.day_15}}</td>
           <td>{{form.day_16}}</td>
           <td>{{form.day_17}}</td>
@@ -71,12 +74,9 @@
         {% endif %}
 
         {% if Week_4 %}  
-        <tr>
-        {% for day in Week_4 %}
-         <td>{{day}}</td>
-        {% endfor %}
-        </tr>
+        
       <tr>
+          <th>4</th>
           <td>{{form.day_22}}</td>
           <td>{{form.day_23}}</td>
           <td>{{form.day_24}}</td>
@@ -91,14 +91,16 @@
 
         
           
-        
+       </tbody> 
       </table> 
       
       <button name="submit" class="btn btn-primary">Save Changes</button>
 
     
 
-    </form>      
+    </form>  
+
+    </div>
 {% endif %}
 
 
