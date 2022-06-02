@@ -13,17 +13,19 @@
     {% endif %}
     {% if history_list %}
       <table class="table table-bordered table-sm">
-        <thead>
+        <thead class="thead-light">
           <tr>
             <th scope="col">Week beginning</th>
             <th scope="col">Distance(KM)</th>
           </tr>  
         </thead>
+        <tbody> 
       {% for week in history_list %}
-        <tr>
-          <td>{{week.date}}</td><td>{{week.distance}}</td>
-        </tr>
+          <tr>
+            <td>{{week.date}}</td><td>{{week.distance}}</td>
+          </tr>
       {% endfor %}
+        </tbody>  
       </table>
     {% endif %}    
 

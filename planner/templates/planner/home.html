@@ -12,13 +12,15 @@
           <h4>User Schedule</h4>
             <table class="table table-bordered table-sm">
               <!-- schedule week one -->
-              <tr>
-                {% for day in schedule_list|slice:":7" %}
-                <td>
-                    {{day.date_str}}
-                </td>
-                {% endfor %}
-              </tr>
+              <thead class="thead-light">
+                <tr>
+                  {% for day in schedule_list|slice:":7" %}
+                  <th scope="col">
+                      {{day.date_str}}
+                  </th>
+                  {% endfor %}
+                </tr>
+              </thead>  
               <tr>
                 {% for day in schedule_list|slice:":7" %}
                 <td>
@@ -36,13 +38,15 @@
                 {% endfor %}
               </tr>
               <!-- schedule week two -->
+              <thead class="thead-light">
               <tr>
                 {% for day in schedule_list|slice:"7:14" %}
-                <td>
+                <th scope="col">
                     {{day.date_str}}
-                </td>
+                </th>
                 {% endfor %}
               </tr>
+              </thead>
               <tr>
                 {% for day in schedule_list|slice:"7:14" %}
                 <td>
@@ -68,9 +72,18 @@
         <!--Individual Activities and links for editing / submitting them -->
         <h4>User Activites List</h4>
           <table class="table table-bordered table-sm">
+            <thead class="thead-light">
             <tr>
-              <th>Name</th><th>Info</th>
+              <th>Activity Name</th>
+              <th>Additional Info</th>
+              <th></th>
+              <th></th>
+              <th></th>
             </tr>
+            </tr>
+            </tr>
+            </tr>
+          </thead>
               {% for act in activities %}
             <tr>
               <td>{{act.name}}</td>
