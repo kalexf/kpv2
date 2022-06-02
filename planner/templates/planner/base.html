@@ -29,11 +29,19 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'users:logout' %}">Log Out</a>
           </li>
+          
+
           <li class="nav-item">
             <a class="nav-link" href="{% url 'planner:history' %}">Activity History</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'planner:mileage' %}">Weekly Distance</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'planner:settings' %}">Preferences</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'planner:helpscreen' %}">User Guide</a>
           </li>
         {% else %}
           <li class="nav-item">
@@ -42,6 +50,7 @@
           <li class="nav-item">
             <a class="nav-link" href="{% url 'users:login' %}">Log in</a>
           </li>
+
         {% endif %}
       </ul>
     </div>

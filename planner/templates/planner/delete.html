@@ -12,7 +12,9 @@
       {% csrf_token %}
         
         <input type="hidden" name="act_id" value={{activity.id}}>
-        <button name="submit" class="btn btn-primary">Delete</button>
+        <button name="submit"
+         class="btn btn-primary btn-danger">Delete
+        </button>
 
     </form>
     <p>

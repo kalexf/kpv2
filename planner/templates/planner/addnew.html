@@ -9,7 +9,8 @@
 {% block content %}
 <!-- Change this to table -->
 
-<table>
+<table class="table table-bordered table-sm" style="font-size:110% ;">
+  <tbody>
   {% for act in ACT_LIST %}
     <tr>
       <td>
@@ -20,6 +21,7 @@
       <td>{{act.description}}</td>
     </tr>  
   {% endfor %}
+</tbody>
 </table>
 {% if add_form %}
   <form method="post" action="{% url 'planner:addnew' %}" class="form">

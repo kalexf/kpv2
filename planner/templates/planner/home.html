@@ -3,11 +3,16 @@
   {% extends 'planner/base.html' %}
   {% load bootstrap4 %}
   {% block page_header %}
-    <h3>Title for Home page</h3>
+    <h4>Home</h4>
       <p>Use this page to create new activities and build a schedule</p>
   {% endblock page_header %}
     {% block content %}
       {% if user.is_authenticated %} <!-- Contains entire page -->
+        {% if not schedule_list %}
+        <p> 
+          <a href="{% url 'planner:helpscreen'%}">View user guide</a>
+        </p>
+        {% endif %}
         {% if schedule_list %}
           <h4>User Schedule</h4>
             <table class="table table-bordered table-sm">
@@ -68,11 +73,10 @@
         <p>
           <a href="{% url 'planner:generate' %}">Create / Edit Training Plan</a>
         </p>  
-        <p>    
-          <a href="{% url 'planner:settings' %}">Edit Preferences</a>
-        </p>  
+         
 
         <!--Individual Activities and links for editing / submitting them -->
+        {% if activities %}
         <h4>User Activites List</h4>
           <table class="table table-bordered table-sm">
             <thead class="thead-light">
@@ -96,7 +100,8 @@
               <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
             </tr>
               {% endfor %}
-          </table>      
+          </table> 
+         {% endif %}      
       
 
         

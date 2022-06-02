@@ -10,6 +10,7 @@
   {% endif %}  
   {% if not message %}
   <h4>Edit Training Plan:</h4>
+  <p>Plan length can be changed in preferences</p>
    <div style="font-size: 85%;">
     <form method="post" action="{% url 'planner:generate' %}" class="form">
       {% csrf_token %} 
