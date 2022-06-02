@@ -277,9 +277,11 @@ class PacedRun(Activity):
 			self.infostring = ""
 		# Set estimated distance.
 		if self.prog_value == self.PROG_CHOICES[0][0]:#minutes
-			dec_pace = profile.user_pace(self.pace)
-			self.distance = dec_pace * Decimal(self.minutes / 60)
-
+			try:
+				dec_pace = profile.user_pace(self.pace)
+				self.distance = dec_pace * Decimal(self.minutes / 60)
+			except:
+				self.distance = 0.0
 
 
 		return self
