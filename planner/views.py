@@ -51,7 +51,10 @@ dateFormat = "%a %d %b"
 rest_string = "Rest Day"
 
 ### VIEW FUNCTIONS ###
-
+def helpscreen(request):
+	"""User guide"""
+	return render(request,'planner/helpscreen.html')
+	
 def home(request):
 	"""
 	Displays schedule, activities, links for edit/ creation screen.
@@ -326,7 +329,7 @@ def edit(request,act_id=None):
 		form = ADD_FORMS[model.act_type](instance=this_act,data=request.POST)
 		if form.is_valid():
 			form.save()
-		this_act.setvalues()
+		this_act.setvalues(get_profile(request.user))
 		this_act.save()
 		# If progressive, go to setgoals page.
 		if this_act.progressive:

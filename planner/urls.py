@@ -28,6 +28,7 @@ urlpatterns = [
 	# Delete various data from profile
 	path('reset/<str:route>',views.reset,name='reset'),
 	path('reset/<str:route>/<str:delete>',views.reset,name='reset'),
+	path('userguide/',views.helpscreen,name='helpscreen'),
 	]
 
 	

@@ -282,8 +282,6 @@ class PacedRun(Activity):
 				self.distance = dec_pace * Decimal(self.minutes / 60)
 			except:
 				self.distance = 0.0
-
-
 		return self
 
 			

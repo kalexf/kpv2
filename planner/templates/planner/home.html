@@ -14,7 +14,7 @@
         </p>
         {% endif %}
         {% if schedule_list %}
-          <h4>User Schedule</h4>
+          <h4>Schedule</h4>
             <table class="table table-bordered table-sm">
               <!-- schedule week one -->
               <thead class="thead-light">
@@ -30,9 +30,7 @@
                 {% for day in schedule_list|slice:":7" %}
                 <td>
                     {{day.name}}
-                    {% if day.link %}
-                    <a href="{% url 'planner:submitdate' day.act_id date_iso %}">Submit</a> 
-                    {% endif %}
+                    
                 </td>
                 {% endfor %}
               </tr>
@@ -41,6 +39,9 @@
                 <td>
                     {% if day.past %}
                       Completed
+                  
+                    {% elif day.link %}
+                      <a href="{% url 'planner:submitdate' day.act_id date_iso %}">Submit</a> 
                     {% endif %}  
                 </td>
                 {% endfor %}
@@ -77,7 +78,7 @@
 
         <!--Individual Activities and links for editing / submitting them -->
         {% if activities %}
-        <h4>User Activites List</h4>
+        <h4>Activites List</h4>
           <table class="table table-bordered table-sm">
             <thead class="thead-light">
             <tr>
@@ -94,7 +95,7 @@
               {% for act in activities %}
             <tr>
               <td>{{act.name}}</td>
-              <td>{{act.infostring}}</td>
+              <td>{% if act.infostring %}{{act.infostring}}{% else %}-{%endif%}</td>
               <td><a href="{% url 'planner:submitdate' act.id date_iso %}">Submit</td>
               <td><a href="{% url 'planner:edit' act.id %}">Edit</a></td>
               <td><a href="{% url 'planner:delete' act.id %}">Delete</a></td> 
@@ -105,7 +106,7 @@
       
 
         
-        <h4>Add exercises</h4>
+        <h4>Add new exercises</h4>
           <a href="{% url 'planner:addnew' %}">Create New Activity</a>
 
         

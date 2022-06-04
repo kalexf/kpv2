@@ -5,8 +5,6 @@ from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
 from .models import DIFF_CHOICES, WEEKS_CHOICES, PACES
 
 ### FORMS ###
-
-
 class PlanForm(forms.Form):
 	"""
 	Dynamic form used for training plan creation page.
@@ -30,21 +28,13 @@ class Profile_Form(forms.ModelForm):
 	"""
 	class Meta:
 		model = Profile
-		fields = [
+		fields = ['plan_length']
+		labels = {'plan_length':'How many weeks should one plan cycle be?'}
 		
-		'plan_length',
-		]
-		labels = {
-		
-		'mileage_target':'Weekly distance target (km)',
-		'mileage_increment':'Weekly distance increase (km).',
-		'plan_length':'How many weeks should one plan cycle be?'
-		
-		}
-		
+
 class PaceForm(forms.ModelForm):
 	"""
-	For for selecing estimated pace values.
+	For for selecting estimated pace values.
 	"""
 	class Meta:
 		model = Profile
@@ -61,10 +51,10 @@ class PaceForm(forms.ModelForm):
 			'pace_2':PACES[2],
 			'pace_3':PACES[3],
 			'pace_4':PACES[4],
-		}	
-# ADD FORMS -Forms for creating new Activity instances
-# - fields vary depending on activity type
+		}
 
+
+# ADD FORMS -Forms for creating new Activity.
 class PR_Form(forms.ModelForm):
 	class Meta:
 		model = PacedRun
@@ -154,8 +144,9 @@ class TT_SubForm(SubmissionForm):
 		min_value = 0,
 		required = False
 		)
-# Goal forms - for setting progression / goal values of activities
 
+
+# Goal forms - for setting progression / goal values of activities
 class PR_Goal_Form(forms.Form):
 	goal_minutes = forms.IntegerField(
 		label='Goal duration(minutes)',
@@ -174,8 +165,10 @@ class PR_Goal_Form(forms.Form):
 	increment_value = forms.DecimalField(
 		max_value = 100,
 		min_value = 0.1,
-		label='Progression value TODO',
+		label='Set the amount by which the distance/time of the activity will\
+ be increased each time it is performed (KM/minutes).',
 		required=True,)
+
 
 class Int_Goal_Form(forms.Form):
 	rep_goal = forms.IntegerField(
