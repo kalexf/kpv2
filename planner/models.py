@@ -5,28 +5,25 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from decimal import Decimal
 from datetime import date
 
-# Create your models here.
-
-
-
-# Used to provide descriptions for activities
+# GLOBALS #
+# Contains text description for each activity.
 ACTIVITY_DESCRIPTIONS = [
-{
-'act_type':'General Run',
-'description':"""A general purpose run, maintaining a steady pace for 
-a set time or distance"""
-},
-{
-'act_type':'Intervals',
-'description':'Repeated short distance runs with rest periods between'
-},
-{
-'act_type':'Time Trial',
-'description':'A fixed distance run with a specific goal time'
-},
-{
-'act_type':'Cross Training',
-'description':'Any non-running exercise activity.'},
+	{
+	'act_type':'General Run',
+	'description':"""A general purpose run, maintaining a steady pace for 
+	a set time or distance"""
+	},
+	{
+	'act_type':'Intervals',
+	'description':'Repeated short distance runs with rest periods between'
+	},
+	{
+	'act_type':'Time Trial',
+	'description':'A fixed distance run with a specific goal time'
+	},
+	{
+	'act_type':'Cross Training',
+	'description':'Any non-running exercise activity.'},
 ]
 
 
@@ -43,7 +40,6 @@ PACE_CHOICES = [
 		]
 # Perceived difficulty of the activity, used in building schedule. Used by 
 # DB models and submission Form
-
 DIFF_CHOICES = [
 	('1','Easy'),
 	('2','Moderate'),
@@ -58,19 +54,20 @@ WEEKS_CHOICES = [
 
 		]	
 
+### MODELS ###
+
 
 class Profile(models.Model):
-	"""Stores information about user used to generate schedule and track
-	statistics. Any information not related to a specific activity saved here"""
-	
+	"""
+	Stores information about user used to generate schedule and track
+	statistics. Any information not related to a specific activity saved here
+	"""
 	# Used to track date which corresponds to first day of shchedule where
 	# sch_length > 1. 
 	schedule_init_date = models.DateField(null=True,blank=True)
 	schedule_week = models.PositiveSmallIntegerField(default=0)
-	owner = models.ForeignKey(
-		User, 
-		on_delete=models.CASCADE
-		)
+	# User the profile is associated with.
+	owner = models.ForeignKey(User,on_delete=models.CASCADE)
 	# User's custom plan dict, maps activity id's to week day names.
 	plan = models.JSONField(null=True,blank=True)
 	# Activity history dictionary.
@@ -88,8 +85,6 @@ class Profile(models.Model):
 	pace_2 = models.DecimalField(decimal_places=2,max_digits=4,default=10.5)
 	pace_3 = models.DecimalField(decimal_places=2,max_digits=4,default=11.5)
 	pace_4 = models.DecimalField(decimal_places=2,max_digits=4,default=13.5)
-
-	
 	def user_pace(self,pace_value):
 		"""Give pace name, get speed for that user"""
 		paces = {
@@ -101,9 +96,6 @@ class Profile(models.Model):
 				}
 		return (paces[pace_value])		
 
-
-
-	
 
 class CompletedAct(models.Model):
 	"""
@@ -163,21 +155,19 @@ class Activity(models.Model):
 		self.last_done = date_done	
 		return self
 
-
-
-
 # Individual activity type models
-
 # REQUIRED METHODS 
 # ALL :
 # setvalues(self) #Set initial values and NAME
-
 # PROGRESSIVE ONLY :
 # setgoals(self, post) 
 # goal_prepop(self)
 
+
 class PacedRun(Activity):
-	"""Standard Taining run - holding a set pace for a set time or distance"""
+	"""
+	Standard Taining run - holding a set pace for a time or distance.
+	"""
 	# User readable act_type and description
 	act_type = ACTIVITY_DESCRIPTIONS[0]['act_type']
 	description = ACTIVITY_DESCRIPTIONS[0]['description']
@@ -282,9 +272,7 @@ class PacedRun(Activity):
 				self.distance = dec_pace * Decimal(self.minutes / 60)
 			except:
 				self.distance = 0.0
-		return self
-
-			
+		return self	
 
 	def goal_prepop(self):
 		"""returns a dictionary of values that can be used to prepopulate
@@ -386,6 +374,7 @@ class TimeTrial(Activity):
 				self.infostring += '0'
 		return(self)	
 
+
 class CrossTrain(Activity):
 	"""Any other exercise type, which the user wants to be taken into account
 	by scheduling algorithm"""
@@ -393,7 +382,6 @@ class CrossTrain(Activity):
 	act_type = ACTIVITY_DESCRIPTIONS[3]['act_type']
 	description = ACTIVITY_DESCRIPTIONS[3]['description']
 	exercise_type = models.CharField(max_length=30,default='Cross Training')
-
 
 	def setvalues(self,profile=None):
 		"""Sets the name field for the activity"""

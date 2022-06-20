@@ -11,15 +11,15 @@
     <form action="{% url 'planner:delete' 0 %}" method="post" class="form">
       {% csrf_token %}
         
-        <input type="hidden" name="act_id" value={{activity.id}}>
-        <button name="submit"
-         class="btn btn-primary btn-danger">Delete
-        </button>
+      <input type="hidden" name="act_id" value={{activity.id}}>
+      <button name="submit"class="btn btn-primary btn-danger">
+        Delete
+      </button>
 
     </form>
-    <p>
-<!-- TODO return link button -->
-<a href="{% url 'planner:home' %}">Return</a>
-</p>
+  <p>
+  <!-- TODO return link button -->
+    <a href="{% url 'planner:home' %}">Return</a>
+  </p>
 
 {% endblock content %}

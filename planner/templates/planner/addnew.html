@@ -9,30 +9,30 @@
 {% block content %}
 <!-- Change this to table -->
 
-<table class="table table-bordered table-sm" style="font-size:110% ;">
-  <tbody>
-  {% for act in ACT_LIST %}
-    <tr>
-      <td>
-        <a href="{% url 'planner:addnew' act.act_type %}">
-          {{act.act_type}}
-        </a> 
-      </td>  
-      <td>{{act.description}}</td>
-    </tr>  
-  {% endfor %}
-</tbody>
-</table>
-{% if add_form %}
-  <form method="post" action="{% url 'planner:addnew' %}" class="form">
-    {% csrf_token %}
+  <table class="table table-bordered table-sm" style="font-size:110% ;">
+    <tbody>
+      {% for act in ACT_LIST %}
+        <tr>
+          <td>
+            <a href="{% url 'planner:addnew' act.act_type %}">
+              {{act.act_type}}
+            </a> 
+          </td>  
+          <td>{{act.description}}</td>
+        </tr>  
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if add_form %}
+    <form method="post" action="{% url 'planner:addnew' %}" class="form">
+      {% csrf_token %}
 
-    {% bootstrap_form add_form %}
+      {% bootstrap_form add_form %}
 
-    <!-- hidden input containing activity type so addnew view knows which form type to save -->
-  <input type="hidden", name="act_type", value="{{act_type}}"> 
-  {% buttons %}
-    <button name="submit" class="btn btn-primary"> Create new {{act_type}}</button>  
-  {% endbuttons %}
-{% endif %}  
-{% endblock content %}
+      <!-- hidden input containing activity type so addnew view knows which form type to save -->
+    <input type="hidden", name="act_type", value="{{act_type}}"> 
+      {% buttons %}
+        <button name="submit" class="btn btn-primary"> Create new {{act_type}}</button>  
+      {% endbuttons %}
+  {% endif %}  
+  {% endblock content %}

@@ -3,8 +3,20 @@
   {% extends 'planner/base.html' %}
   {% load bootstrap4 %}
   {% block page_header %}
+    {% if user.is_authenticated %}
     <h4>Home</h4>
       <p>Use this page to create new activities and build a schedule</p>
+    {% else %}
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">Welcome to Kanplan</h5>
+        <p class="card-text">Using this web app, you can create customisable training schedules for running and track your progress.</p>
+        <p><a href="{% url 'planner:helpscreen' %}" class="btn btn-primary">User Guide</a></p>
+        <p><a href="{% url 'users:register' %}" class="btn btn-primary">Register</a></p>
+        <p><a href="{% url 'users:login' %}" class="btn btn-primary">Login</a></p>
+      </div>
+    </div>
+    {% endif %}
   {% endblock page_header %}
     {% block content %}
       {% if user.is_authenticated %} <!-- Contains entire page -->
@@ -105,17 +117,17 @@
          {% endif %}      
       
 
-        
+        <p>
         <h4>Add new exercises</h4>
           <a href="{% url 'planner:addnew' %}">Create New Activity</a>
-
+</p>
+<br>
         
 
     
 
        
-       {% else %} 
-         <p>Please log in /register </p>
+       
        {% endif %} 
  
     {% endblock content %}

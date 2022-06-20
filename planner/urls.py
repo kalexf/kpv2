@@ -1,8 +1,8 @@
-# url aths for Planner app
 from django.urls import path
 
 from . import views
 
+# url aths for Planner app
 app_name = 'planner'
 urlpatterns = [
 	path('',views.home,name='home'),

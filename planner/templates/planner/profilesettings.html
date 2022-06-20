@@ -1,23 +1,21 @@
 {% extends 'planner/base.html' %}
 {% load bootstrap4 %}
-
-
 {% block content %}
 <!--Form page for editing personal settings, schedule settings -->
 {% if form %}
-<h5 style="color:teal;">Schedule length settings:</h5>
-<form class="form" action="{% url 'planner:settings' %}" method="post">
-  {% csrf_token %}
-  {% bootstrap_form form %}
- <button name="submit" class="btn btn-primary">Save changes</button> 
-</form> 
+  <h5 style="color:teal;">Schedule length settings:</h5>
+    <form class="form" action="{% url 'planner:settings' %}" method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+      <button name="submit" class="btn btn-primary">Save changes</button> 
+    </form> 
 {% endif %}  
 {% if not reset_visible %}
 <div>
   <p>
     <form class="form" action="{% url 'planner:reset' 'reveal' %}" method="post">
-    {% csrf_token %}
-    <button name="submit" class="btn btn-primary">Show data reset options</button>
+      {% csrf_token %}
+      <button name="submit" class="btn btn-primary">Show data reset options</button>
     </form>
   </p>
  </div> 
@@ -41,24 +39,20 @@
   <p>
     <a href="{% url 'planner:reset' 'distance_hist' %}">Delete Distance History</a>
     {% if distance_hist %}
-      <a href="{% url 'planner:reset' 'distance_hist' 'delete'%}"style="color:Tomato;">
-      Confirm Delete(final)</a>
-
+    <a href="{% url 'planner:reset' 'distance_hist' 'delete'%}"style="color:Tomato;">
+      Confirm Delete(final)
+    </a>
     {% endif %} 
   </p>
 {% endif %}
 </div>  
-{% if paces_form %}
-  <h5 style="color:teal;">Pace settings:</h5>
-  <p>These values are used for estimating the distance of time-based activites.</p>
-  <form class="form" action="{% url 'planner:savepacesettings' %}" method="post">
-  {% csrf_token %}
-  {% bootstrap_form paces_form %}
-  <button name="submit" class="btn btn-primary">Save pace settings</button>
-  </form>
- 
-
-
-
-{% endif %}
+  {% if paces_form %}
+    <h5 style="color:teal;">Pace settings:</h5>
+      <p>These values are used for estimating the distance of time-based activites.</p>
+      <form class="form" action="{% url 'planner:savepacesettings' %}" method="post">
+        {% csrf_token %}
+        {% bootstrap_form paces_form %}
+      <button name="submit" class="btn btn-primary">Save pace settings</button>
+      </form>
+  {% endif %}
 {% endblock content %}

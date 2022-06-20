@@ -54,7 +54,44 @@ rest_string = "Rest Day"
 def helpscreen(request):
 	"""User guide"""
 	return render(request,'planner/helpscreen.html')
+
+
+@login_required
+def view_history(request):
+	"""
+	Return page showing table of weekly distance totals.
+	"""
+	context = {}
+	profile = get_profile(request.user)
+	if profile.history:
+		try:
+			history_list = json.loads(profile.history)
+			context['history_list'] = history_list
+		except:
+			context['message'] = 'Error loading history.'
 	
+	else:
+		context['message'] = 'No history to show yet! Please try harder.'
+					
+	return render(request,'planner/history.html',context)	 
+
+	
+@login_required
+def mileage(request):
+	"""
+	Render history of weekly distance.
+	"""
+	context={}
+	profile=get_profile(request.user)
+	if profile.mileage_history:
+		history_list = json.loads(profile.mileage_history)
+		context['history_list']=history_list
+	else:
+		context['message']='No mileage history yet, complete some activities.'	
+	
+	return render(request, 'planner/mileage_history.html',context)
+
+
 def home(request):
 	"""
 	Displays schedule, activities, links for edit/ creation screen.
@@ -100,26 +137,6 @@ def home(request):
 
 
 @login_required
-def view_history(request):
-	"""
-	Render page showing table of weekly distance totals.
-	"""
-	context = {}
-	profile = get_profile(request.user)
-	if profile.history:
-		try:
-			history_list = json.loads(profile.history)
-			context['history_list'] = history_list
-		except:
-			context['message'] = 'Error loading history.'
-	
-	else:
-		context['message'] = 'No history to show yet! Please try harder.'
-					
-	return render(request,'planner/history.html',context)	 
-
-
-@login_required
 def add_new(request,act_type=''):
 	"""Display form for creation of new activity types."""
 	
@@ -143,8 +160,9 @@ def add_new(request,act_type=''):
 					}
 				return render(request,'planner/setgoal.html',context)
 		return redirect('planner:home')	
+	
 	else:	
-		# request from link, provide appropriate form for new activity.
+		# GET request from link, provide appropriate form for new activity.
 		context = {'ACT_LIST':ACT_LIST}
 		# If user clicked on link to create specific activity type,
 		# serve form for creation of that.
@@ -154,22 +172,6 @@ def add_new(request,act_type=''):
 			context['act_type'] = act_type
 		return render(request,'planner/addnew.html', context)
 
-
-@login_required
-def mileage(request):
-	"""
-	Render history of weekly distance.
-	"""
-	context={}
-	profile=get_profile(request.user)
-	if profile.mileage_history:
-		history_list = json.loads(profile.mileage_history)
-		context['history_list']=history_list
-	else:
-		context['message']='No mileage history yet, complete some activities.'	
-	
-	return render(request, 'planner/mileage_history.html',context)
-	
 
 @login_required
 def settings(request):
@@ -198,8 +200,8 @@ def settings(request):
 			profile.schedule_week = 0
 			profile.plan = None
 			profile.save()
-		
 		return redirect('planner:home')
+
 
 @login_required
 def savepacesettings(request):
@@ -211,8 +213,8 @@ def savepacesettings(request):
 		pace_form = PaceForm(instance=profile,data=request.POST)
 		if pace_form.is_valid():
 			pace_form.save()
-	
 	return redirect('planner:home')
+
 
 @login_required
 def submit(request,act_id,date_iso):
@@ -266,8 +268,8 @@ def submit(request,act_id,date_iso):
 			profile = update_mileage(profile,date_done,distance)
 		# Delete any completed acts that are no longer needed
 		clean_completed_acts(request.user,29)
-		
-		profile.save()				
+		profile.save()		
+
 	return redirect('planner:home')	
 		
 
@@ -299,7 +301,7 @@ def generate_plan(request):
 		# Remove unnecessary fields.
 		plan_dict.pop('csrfmiddlewaretoken')
 		plan_dict.pop('submit')	
-		# Save submitted plan to JSON field on profile.
+		# Save submitted plan form values to JSON field on profile.
 		profile.plan = json.dumps(plan_dict)
 		profile.save()
 		return redirect('planner:home')		
@@ -321,12 +323,10 @@ def edit(request,act_id=None):
 	# Check ownership.
 	if activity.owner != request.user:
 		raise Http404			
-	
-	model = get_model(activity.my_type)
-	this_act = model.objects.get(id=act_id)
-	# Save Form		
+	this_act = get_model(activity.my_type).objects.get(id=act_id)
+	# Save submitted Form.		
 	if request.method == 'POST':
-		form = ADD_FORMS[model.act_type](instance=this_act,data=request.POST)
+		form = ADD_FORMS[this_act.act_type](instance=this_act,data=request.POST)
 		if form.is_valid():
 			form.save()
 		this_act.setvalues(get_profile(request.user))
@@ -344,13 +344,14 @@ def edit(request,act_id=None):
 		# Non-progressive, redirect home.	
 		return redirect('planner:home')		
 	# Get appropriate form and populate it	
-	form = ADD_FORMS[model.act_type](instance=this_act)
+	form = ADD_FORMS[this_act.act_type](instance=this_act)
 	context = {
-	'form':form,
-	'name':activity.name,
-	'act_id':act_id
+		'form':form,
+		'name':activity.name,
+		'act_id':act_id
 	}
 	return render(request,'planner/edit.html',context)
+
 
 @login_required
 def reset(request,route,delete=None):
@@ -368,14 +369,11 @@ def reset(request,route,delete=None):
 		# Delete all completed acts.
 		clean_completed_acts(request.user,-1)
 		profile.save()
-
 		return redirect('planner:home')	
-	
 
 	context = {'reset_visible':True}
 	context[route] = True
 	return render(request,'planner/profilesettings.html',context)
-	
 	
 			
 @login_required

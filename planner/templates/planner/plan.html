@@ -19,9 +19,9 @@
         <thead>
         <tr>
           <th>Week:</th>
-        {% for day in Week_1 %}
-         <th>{{day}}</th>
-        {% endfor %}
+          {% for day in Week_1 %}
+          <th>{{day}}</th>
+          {% endfor %}
       </tr>
       </thead>
       <tbody >
@@ -35,14 +35,8 @@
           <td>{{form.day_6}}</td>
           <td>{{form.day_7}}</td>
         </tr>
-     
-
-        
         {% endif %}
-
         {% if Week_2 %}  
-        
-       
       <tr>
           <th>2</th>
           <td>{{form.day_8}}</td>
@@ -52,14 +46,9 @@
           <td>{{form.day_12}}</td>
           <td>{{form.day_13}}</td>
           <td>{{form.day_14}}</td>
-        </tr> 
-       
-
-        
+        </tr>        
         {% endif %}
-
-        {% if Week_3 %}
-      
+        {% if Week_3 %}   
       <tr>
           <th>3</th>
           <td>{{form.day_15}}</td>
@@ -70,12 +59,8 @@
           <td>{{form.day_20}}</td>
           <td>{{form.day_21}}</td>
         </tr>
-
-        
         {% endif %}
-
-        {% if Week_4 %}  
-        
+        {% if Week_4 %}    
       <tr>
           <th>4</th>
           <td>{{form.day_22}}</td>
@@ -85,27 +70,12 @@
           <td>{{form.day_26}}</td>
           <td>{{form.day_27}}</td>
           <td>{{form.day_28}}</td>
-        </tr>  
-
-       
-        {% endif %}
-
-        
-          
-       </tbody> 
+        </tr>        
+        {% endif %}       
+        </tbody> 
       </table> 
-      
       <button name="submit" class="btn btn-primary">Save Changes</button>
-
-    
-
     </form>  
-
-    </div>
+  </div>
 {% endif %}
-
-
-
-
-
 {% endblock content %}

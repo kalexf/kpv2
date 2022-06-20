@@ -1,7 +1,5 @@
 from django import forms
-
-from .models import (Activity, PacedRun, Intervals, TimeTrial, CrossTrain,
-	Profile)
+from .models import Activity, PacedRun, Intervals, TimeTrial, CrossTrain, Profile
 from .models import DIFF_CHOICES, WEEKS_CHOICES, PACES
 
 ### FORMS ###
@@ -12,7 +10,6 @@ class PlanForm(forms.Form):
 	and list of 2-tuples 'choices', which is used to create
 	select menus for each field. 
 	"""
-
 	def __init__(self,weeks,choices,initial_dict=None):
 		super(PlanForm,self).__init__()
 		for i in range(weeks * 7):
@@ -52,6 +49,7 @@ class PaceForm(forms.ModelForm):
 			'pace_3':PACES[3],
 			'pace_4':PACES[4],
 		}
+		
 
 
 # ADD FORMS -Forms for creating new Activity.
@@ -87,7 +85,6 @@ class Int_Form(forms.ModelForm):
 			'rep_number',
 			'progressive',
 			'customname',
-		
 			]
 		labels = {
 			'rep_length':'Interval length(m)',
@@ -95,6 +92,8 @@ class Int_Form(forms.ModelForm):
 			'progressive':'Progressive?',
 			'customname':'Use Custom name? Leave blank to use default.',
 			}
+
+
 class TT_Form(forms.ModelForm):
 	class Meta:
 		model = TimeTrial
@@ -105,7 +104,9 @@ class TT_Form(forms.ModelForm):
 		labels = {
 			'distance':'Distance(km)',
 			'customname':'Use Custom name? Leave blank to use default.',
-			}			
+			}	
+
+
 class CT_Form(forms.ModelForm):
 	class Meta:
 		model = CrossTrain
@@ -115,6 +116,7 @@ class CT_Form(forms.ModelForm):
 		labels = {
 		'exercise_type':'Activity Name'
 			}		
+
 
 class SubmissionForm(forms.Form):
 	"""
